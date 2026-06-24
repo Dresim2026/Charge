@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شحن بلس | Sh7n Plus - متجر الشرائح</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #0f3460;
+            --accent: #e94560;
+            --gold: #f5c518;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --border: #e9ecef;
+            --shadow: 0 10px 40px rgba(0,0,0,0.08);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f0f2f5;
+            color: #2d3436;
+            line-height: 1.7;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(233, 68, 96, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(15, 52, 96, 0.03) 0%, transparent 50%);
+        }
+
+        .top-bar {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 8px 15px;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+
+        .top-bar span {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 0 15px 30px;
+        }
+
+        /* ========== الهيدر واللوجو الجديد ========== */
+        .header {
+            text-align: center;
+            padding: 35px 20px 25px;
+            position: relative;
+        }
+
+        .logo-wrapper {
+            display: inline-block;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        /* تصميم شعار جديد: أيقونة شحن سريع (صاروخ) مع تأثير دائري */
+        .logo-icon {
+            width: 85px;
+            height: 85px;
+            background: linear-gradient(135deg, #e94560, #c23152, #ff8c00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 15px 35px rgba(233, 68, 96, 0.35), 0 0 0 6px rgba(233,68,96,0.1);
+            transition: var(--transition);
+            animation: pulseGlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 15px 35px rgba(233, 68, 96, 0.35), 0 0 0 6px rgba(233,68,96,0.1); }
+            50% { box-shadow: 0 20px 45px rgba(233, 68, 96, 0.6), 0 0 20px rgba(233,68,96,0.3), 0 0 0 10px rgba(233,68,96,0.05); }
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.07);
+        }
+
+        .logo-icon i {
+            font-size: 2.8em;
+            color: white;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.7));
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .logo-text {
+            font-size: 2.8em;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .logo-text .sh7n {
+            color: var(--primary);
+        }
+
+        .logo-text .plus {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 10px;
+            display: inline-block;
+            font-size: 0.7em;
+            position: relative;
+            top: -5px;
+            box-shadow: 0 5px 15px rgba(233,68,96,0.3);
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1em;
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        .features-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0 10px;
+        }
+
+        .feature-badge {
+            background: white;
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .feature-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+
+        .feature-badge .icon {
+            font-size: 1.2em;
+        }
+
+        /* الفلاتر */
+        .filters-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.9em;
+        }
+
+        .filter-group label i {
+            margin-left: 5px;
+            color: var(--accent);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--light);
+            font-size: 0.95em;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e94560' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            padding-left: 35px;
+        }
+
+        select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(233, 68, 96, 0.1);
+            background: white;
+        }
+
+        /* كروت الباقات */
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px 18px 18px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #ff6b6b);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(233, 68, 96, 0.15);
+        }
+
+        .plan-card:hover::before {
+            opacity: 1;
+        }
+
+        .plan-card.featured {
+            border-color: rgba(245, 197, 24, 0.4);
+        }
+
+        .plan-card.featured::before {
+            opacity: 1;
+            background: linear-gradient(90deg, #f5c518, #ffaa00);
+        }
+
+        .company-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .badge-wecom { background: #e8f5e9; color: #2e7d32; }
+        .badge-cellcom { background: #e3f2fd; color: #1565c0; }
+        .badge-partnet { background: #fff3e0; color: #e65100; }
+        .badge-hot { background: #fce4ec; color: #c62828; }
+        .badge-pelephone { background: #f3e5f5; color: #6a1b9a; }
+        .badge-aloha { background: #e0f7fa; color: #00695c; }
+
+        .plan-name {
+            font-size: 1.05em;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+
+        .plan-data {
+            font-size: 0.85em;
+            color: var(--gray);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .plan-data i {
+            color: var(--accent);
+            font-size: 0.8em;
+        }
+
+        .plan-duration {
+            display: inline-block;
+            background: var(--light);
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+
+        .price-tag {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+
+        .price-tag .currency {
+            font-size: 0.6em;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .btn-select {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: var(--radius-sm);
+            font-size: 0.95em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .btn-select:hover {
+            background: linear-gradient(135deg, #128C7E, #075e54);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-select i {
+            margin-left: 5px;
+        }
+
+        .no-plans {
+            text-align: center;
+            grid-column: 1/-1;
+            padding: 40px;
+            color: var(--gray);
+            font-size: 1.1em;
+        }
+
+        .no-plans i {
+            display: block;
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        /* نموذج الطلب */
+        .order-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px 28px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .order-card h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 1.6em;
+            font-weight: 900;
+        }
+
+        .order-card .order-subtitle {
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 22px;
+            font-size: 0.9em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group.full {
+            grid-column: 1/-1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.88em;
+        }
+
+        .form-group label i {
+            margin-left: 4px;
+            color: var(--accent);
+            font-size: 0.8em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95em;
+            font-family: 'Cairo', sans-serif;
+            transition: var(--transition);
+            background: var(--light);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(233, 68, 96, 0.08);
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #e94560, #c23152);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.15em;
+            font-weight: 700;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Cairo', sans-serif;
+            margin-top: 5px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #c23152, #a01d3a);
+            box-shadow: 0 12px 30px rgba(233, 68, 96, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-submit i {
+            margin-left: 8px;
+        }
+
+        .payment-badge {
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 700;
+            color: var(--secondary);
+            background: #f0fdf4;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            border: 1px dashed #25D366;
+            font-size: 0.9em;
+        }
+
+        .payment-badge i {
+            color: #25D366;
+            margin-left: 4px;
+        }
+
+        /* الفوتر */
+        .footer {
+            text-align: center;
+            padding: 25px 20px;
+            color: var(--gray);
+            font-size: 0.85em;
+            border-top: 2px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .footer .footer-brand {
+            font-weight: 900;
+            color: var(--primary);
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .footer .footer-brand .plus {
+            color: var(--accent);
+        }
+
+        .whatsapp-links {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #25D366;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: var(--transition);
+        }
+
+        .whatsapp-link:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .copyright {
+            margin-top: 12px;
+            color: #aaa;
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 600px) {
+            .logo-text {
+                font-size: 2.2em;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+            .filters-card {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .features-bar {
+                gap: 8px;
+            }
+            .feature-badge {
+                font-size: 0.78em;
+                padding: 8px 14px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .plan-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .plan-card:nth-child(1) { animation-delay: 0.05s; }
+        .plan-card:nth-child(2) { animation-delay: 0.1s; }
+        .plan-card:nth-child(3) { animation-delay: 0.15s; }
+        .plan-card:nth-child(4) { animation-delay: 0.2s; }
+        .plan-card:nth-child(5) { animation-delay: 0.25s; }
+        .plan-card:nth-child(6) { animation-delay: 0.3s; }
+        .plan-card:nth-child(7) { animation-delay: 0.35s; }
+        .plan-card:nth-child(8) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        📢 توصيل سريع لجميع المناطق — <span>الدفع عند الاستلام</span>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <!-- أيقونة جديدة: صاروخ يعبر عن الشحن السريع -->
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+            </div>
+            <div class="logo-text">
+                <span class="sh7n">شحن</span><span class="plus">PLUS</span>
+            </div>
+            <p class="subtitle">
+                اختر الشريحة المناسبة، أدخل بياناتك، ونتواصل معك لتأكيد الطلب وتسليم الشريحة عن طريق أقرب موزّع لك.
+            </p>
+            <div class="features-bar">
+                <div class="feature-badge"><span class="icon">⚡</span> تفعيل سريع</div>
+                <div class="feature-badge"><span class="icon">📍</span> تغطية في أغلب مناطق القطاع</div>
+                <div class="feature-badge"><span class="icon">💵</span> الدفع عند الاستلام</div>
+            </div>
+        </header>
+
+        <div class="filters-card">
+            <div class="filter-group">
+                <label><i class="fa-solid fa-building"></i> تصفية حسب الشركة</label>
+                <select id="companyFilter">
+                    <option value="all">كل الشركات</option>
+                    <option value="ويكوم">ويكوم</option>
+                    <option value="سلكوم">سلكوم</option>
+                    <option value="Partnet">بارتنر</option>
+                    <option value="هوت موبايل">هوت موبايل</option>
+                    <option value="بلفون">بلفون</option>
+                    <option value="Aloha">ألوها</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fa-solid fa-clock"></i> فلتر المدة</label>
+                <select id="durationFilter">
+                    <option value="all">كل المدد</option>
+                    <option value="شهر">شهر</option>
+                    <option value="3 شهور">3 شهور</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="plans-grid" id="plansContainer"></div>
+
+        <div class="order-card">
+            <h2>📋 طلب شرائح</h2>
+            <p class="order-subtitle">اختر شريحة أو أكثر من القائمة، ثم أدخل بياناتك وسيتم التواصل معك لتأكيد الطلب وتحديد نقطة الاستلام.</p>
+            <form id="mainOrderForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> الاسم الكامل</label>
+                        <input type="text" id="fullName" placeholder="أدخل اسمك الكامل" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-mobile-screen"></i> رقم الجوال</label>
+                        <input type="tel" id="phone" placeholder="05XXXXXXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-brands fa-whatsapp"></i> رقم الواتساب</label>
+                        <input type="tel" id="whatsapp" placeholder="+9725XXXXXXXX" value="+972">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-location-dot"></i> المنطقة المفضلة للاستلام</label>
+                        <select id="area">
+                            <option value="">اختر المنطقة</option>
+                            <option value="غزة">📍 غزة</option>
+                            <option value="خانيونس">📍 خانيونس</option>
+                            <option value="رفح">📍 رفح</option>
+                            <option value="الشمال">📍 الشمال</option>
+                            <option value="الوسطى">📍 الوسطى</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label><i class="fa-solid fa-pen-to-square"></i> ملاحظات <span style="font-weight:400;color:#aaa;">(اختياري)</span></label>
+                        <textarea id="notes" rows="2" placeholder="أي ملاحظات إضافية..."></textarea>
+                    </div>
+                </div>
+                <button type="button" class="btn-submit" onclick="submitOrder()">
+                    <i class="fa-solid fa-paper-plane"></i> ✅ تأكيد الطلب
+                </button>
+                <div class="payment-badge">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> الدفع عند الاستلام
+                </div>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-brand">شحن<span class="plus">PLUS</span></div>
+            <div class="whatsapp-links">
+                <a href="https://wa.me/972594882070" target="_blank" class="whatsapp-link">
+                    <i class="fa-brands fa-whatsapp"></i> +972 59-488-2070
+                </a>
+                <a href="https://wa.me/972507194570" target="_blank" class="whatsapp-link">
+                    <i class="fa-brands fa-whatsapp"></i> +972 50-719-4570
+                </a>
+            </div>
+            <div class="copyright">
+                © 2026 شحن بلس — جميع الحقوق محفوظة.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // الأسعار المعتمدة من الكود المطلوب
+        const plans = [
+            {
+                company: "ويكوم",
+                badge: "badge-wecom",
+                name: "ويكوم 500 جيجا / شهر",
+                data: "500 جيجا",
+                duration: "شهر",
+                price: "100.00",
+                currency: "₪",
+                featured: false,
+                whatsappMsg: "أريد طلب شريحة ويكوم 500 جيجا شهر"
+            },
+            {
+                company: "سلكوم",
+                badge: "badge-cellcom",
+                name: "سلكوم 400 جيجا / شهر",
+                data: "400 جيجا",
+                duration: "شهر",
+                price: "70.00",
+                currency: "₪",
+                featured: true,
+                whatsappMsg: "أريد طلب شريحة سلكوم 400 جيجا شهر"
+            },
+            {
+                company: "بارتنر",
+                badge: "badge-partnet",
+                name: "بارتنر 500 جيجا / شهر",
+                data: "500 جيجا",
+                duration: "شهر",
+                price: "150.00",
+                currency: "₪",
+                featured: false,
+                whatsappMsg: "أريد طلب شريحة بارتنر 500 جيجا شهر"
+            },
+            {
+                company: "هوت موبايل",
+                badge: "badge-hot",
+                name: "هوت 150 جيجا / شهر",
+                data: "150 جيجا",
+                duration: "شهر",
+                price: "150.00",
+                currency: "₪",
+                featured: false,
+                whatsappMsg: "أريد طلب شريحة هوت موبايل 150 جيجا شهر"
+            },
+            {
+                company: "بلفون",
+                badge: "badge-pelephone",
+                name: "بلفون 500 جيجا / شهر",
+                data: "500 جيجا",
+                duration: "شهر",
+                price: "150.00",
+                currency: "₪",
+                featured: false,
+                whatsappMsg: "أريد طلب شريحة بلفون 500 جيجا شهر"
+            },
+            {
+                company: "ألوها",
+                badge: "badge-aloha",
+                name: "ألوها 150 جيجا / شهر",
+                data: "150 جيجا / سياسة استخدام عادل 4 جيجا يومياً",
+                duration: "شهر",
+                price: "150.00",
+                currency: "₪",
+                featured: false,
+                whatsappMsg: "أريد طلب شريحة ألوها 150 جيجا شهر"
+            },
+            {
+                company: "سلكوم",
+                badge: "badge-cellcom",
+                name: "سلكوم 400 جيجا / 3 شهور",
+                data: "400 جيجا",
+                duration: "3 شهور",
+                price: "150.00",
+                currency: "₪",
+                featured: false,
+                whatsappMsg: "أريد طلب شريحة سلكوم 400 جيجا 3 شهور"
+            },
+            {
+                company: "ويكوم",
+                badge: "badge-wecom",
+                name: "عرض ويكوم / 3 شهور",
+                data: "1500 جيجا",
+                duration: "3 شهور",
+                price: "150.00",
+                currency: "₪",
+                featured: true,
+                whatsappMsg: "أريد طلب عرض ويكوم 1500 جيجا 3 شهور"
+            }
+        ];
+
+        const plansContainer = document.getElementById('plansContainer');
+        const companyFilter = document.getElementById('companyFilter');
+        const durationFilter = document.getElementById('durationFilter');
+        const whatsappNumber = '972594882070';
+
+        function renderPlans() {
+            const selectedCompany = companyFilter.value;
+            const selectedDuration = durationFilter.value;
+
+            const filtered = plans.filter(plan => {
+                const companyMatch = selectedCompany === 'all' || plan.company === selectedCompany;
+                const durationMatch = selectedDuration === 'all' || plan.duration === selectedDuration;
+                return companyMatch && durationMatch;
+            });
+
+            plansContainer.innerHTML = '';
+
+            if (filtered.length === 0) {
+                plansContainer.innerHTML = `<div class="no-plans"><i class="fa-solid fa-circle-exclamation"></i>لا توجد باقات تطابق الفلتر المحدد</div>`;
+                return;
+            }
+
+            filtered.forEach(plan => {
+                const card = document.createElement('div');
+                card.className = `plan-card ${plan.featured ? 'featured' : ''}`;
+                card.innerHTML = `
+                    <span class="company-badge ${plan.badge}">${plan.company}</span>
+                    <div class="plan-name">${plan.name}</div>
+                    <div class="plan-data"><i class="fa-solid fa-wifi"></i> ${plan.data}</div>
+                    <div class="plan-duration"><i class="fa-regular fa-clock"></i> ${plan.duration}</div>
+                    <div class="price-tag">${plan.price} <span class="currency">${plan.currency}</span></div>
+                    <button class="btn-select" onclick="selectPlan('${plan.whatsappMsg.replace(/'/g, "\\'")}')">
+                        <i class="fa-brands fa-whatsapp"></i> اختيار الشريحة
+                    </button>
+                `;
+                plansContainer.appendChild(card);
+            });
+        }
+
+        function selectPlan(message) {
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message + ' — من متجر شحن بلس')}`;
+            window.open(url, '_blank');
+        }
+
+        function submitOrder() {
+            const name = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const area = document.getElementById('area').value;
+            const notes = document.getElementById('notes').value.trim();
+
+            if (!name || !phone) {
+                alert('⚠️ الرجاء إدخال الاسم الكامل ورقم الجوال على الأقل');
+                return;
+            }
+
+            let message = `🛒 *طلب جديد من متجر شحن بلس*%0A%0A`;
+            message += `👤 *الاسم:* ${name}%0A`;
+            message += `📱 *رقم الجوال:* ${phone}%0A`;
+            if (whatsapp && whatsapp !== '+972') message += `💬 *الواتساب:* ${whatsapp}%0A`;
+            if (area) message += `📍 *المنطقة:* ${area}%0A`;
+            if (notes) message += `📝 *ملاحظات:* ${notes}%0A`;
+            message += `%0A💵 *الدفع عند الاستلام*`;
+
+            const url = `https://wa.me/${whatsappNumber}?text=${message}`;
+            window.open(url, '_blank');
+        }
+
+        companyFilter.addEventListener('change', renderPlans);
+        durationFilter.addEventListener('change', renderPlans);
+        renderPlans();
+    </script>
+</body>
+</html>
