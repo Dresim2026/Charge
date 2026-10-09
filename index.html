@@ -183,6 +183,11 @@ h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
       <input id="impFile" type="file" accept=".json,application/json" hidden>
       <p class="hint">صدّر النسخة وأرسلها لجهاز آخر (واتساب أو غيره) ثم استوردها هناك. يؤخذ الأحدث تعديلًا لكل سجل.</p>
     </div>
+    <div class="field">
+      <label>الإشعارات والمنبه</label>
+      <button class="btn" type="button" id="testBtn">تفعيل الإشعارات واختبارها</button>
+      <p class="hint">اضغط الزر ثم اخرج من التطبيق. يجب أن يصلك إشعار خلال 10 ثوانٍ. إن لم يصل، اسمح للتطبيق بالإشعارات والمنبهات، وأوقف توفير البطارية له من إعدادات الهاتف.</p>
+    </div>
     <div class="err" id="setMsg" role="status"></div>
     <div class="actions"><button class="btn primary" type="button" id="setClose">إغلاق</button></div>
   </div>
@@ -327,6 +332,9 @@ h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
   }
 
   // ---------- local notifications (phone fires them, no internet needed)
+  async function ensureChannel() {
+    try { await LN.createChannel({ id: "alarms", name: "تنبيهات الفصل والمنبه", description: "إشعارات موعد الفصل والمنبه", importance: 5, visibility: 1, vibration: true }); } catch (e) {}
+  }
   var schedTimer;
   function scheduleNotifs() { clearTimeout(schedTimer); schedTimer = setTimeout(doSchedule, 400); }
   async function doSchedule() {
@@ -335,6 +343,7 @@ h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
       var perm = await LN.checkPermissions();
       if (perm.display !== "granted") perm = await LN.requestPermissions();
       if (perm.display !== "granted") return;
+      await ensureChannel();
       var pend = await LN.getPending();
       if (pend.notifications && pend.notifications.length) await LN.cancel({ notifications: pend.notifications });
       var list = [], now = Date.now(), h = settings.hour;
@@ -351,6 +360,7 @@ h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
           if (!isNaN(at) && at.getTime() > now) list.push({ id: hash(r._id + "a"), title: "منبه", body: who + (r.notes ? " — " + r.notes : ""), schedule: { at: at, allowWhileIdle: true } });
         }
       });
+      list.forEach(function (n) { n.channelId = "alarms"; });
       list.sort(function (a, b) { return a.schedule.at - b.schedule.at; });
       if (list.length) await LN.schedule({ notifications: list.slice(0, 450) });
     } catch (e) {}
@@ -481,6 +491,23 @@ h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
       $("impFile").value = "";
     };
     fr.readAsText(f);
+  });
+
+  $("testBtn").addEventListener("click", async function () {
+    var m = $("setMsg");
+    if (!LN) { m.textContent = "الإشعارات تعمل داخل تطبيق الأندرويد فقط."; return; }
+    try {
+      var p = await LN.requestPermissions();
+      if (p.display !== "granted") { m.textContent = "الإشعارات مرفوضة. فعّلها من إعدادات الهاتف ← التطبيقات ← سجل الشرائح ← الإشعارات."; return; }
+      await ensureChannel();
+      var ex = null; try { ex = await LN.checkExactNotificationSetting(); } catch (e) {}
+      if (ex && ex.exact_alarm && ex.exact_alarm !== "granted") {
+        m.textContent = "اسمح بـ «المنبهات والتذكيرات» في الشاشة التي ستُفتح، ثم ارجع واضغط الزر مرة أخرى.";
+        await LN.changeExactNotificationSetting(); return;
+      }
+      await LN.schedule({ notifications: [{ id: 999999991, title: "اختبار المنبه", body: "إذا ظهر هذا الإشعار فالمنبه يعمل.", channelId: "alarms", schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true } }] });
+      m.textContent = "سيصلك إشعار خلال 10 ثوانٍ. اخرج من التطبيق وانتظر.";
+    } catch (e) { m.textContent = "تعذر الاختبار."; }
   });
 
   loadAll(); render(); scheduleNotifs();
