@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>سجل الشرائح</title>
+<style>
+:root {
+  --bg: #f3f5f7; --surface: #ffffff; --fg: #16202a; --muted: #5d6b79; --line: #dbe1e7;
+  --accent: #0b5f7a; --accent-fg: #ffffff; --accent-soft: #dcecf2;
+  --on: #136b3a; --on-bg: #dcf1e4; --hold: #8a5a00; --hold-bg: #fbecc8; --off: #a12b2b; --off-bg: #f9dede;
+  --danger: #b3261e; --shadow: 0 10px 40px rgba(10,30,45,.22);
+  --font: system-ui, "Segoe UI", Roboto, Tahoma, sans-serif;
+  --mono: ui-monospace, Consolas, "Roboto Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f161c; --surface: #172029; --fg: #e6edf3; --muted: #93a2b1; --line: #263440;
+    --accent: #4fb3d1; --accent-fg: #062029; --accent-soft: #14323d;
+    --on: #6fd49a; --on-bg: #14341f; --hold: #f0c261; --hold-bg: #3a2c0c; --off: #f08a8a; --off-bg: #3d1a1a;
+    --danger: #f2877f; --shadow: 0 10px 40px rgba(0,0,0,.6);
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { color-scheme: light dark; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5;
+  padding-inline: 14px; padding-block: env(safe-area-inset-top, 0px) calc(40px + env(safe-area-inset-bottom, 0px)); }
+.wrap { max-width: 1040px; margin-inline: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { position: sticky; top: 0; z-index: 5; background: var(--bg); padding-block: 14px 8px; display: grid; gap: 10px; }
+.titlebar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.sub { color: var(--muted); font-size: .82rem; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 9px 14px; font-weight: 500; }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
+.btn.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
+.btn.danger.armed { background: var(--danger); color: var(--surface); }
+.btns { display: flex; gap: 8px; }
+.search input { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 11px 14px; font-size: 1rem; }
+.search input::placeholder { color: var(--muted); }
+.tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.tab { flex: 0 0 auto; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; display: inline-flex; gap: 8px; align-items: baseline; font-size: .9rem; }
+.tab b { font-family: var(--mono); font-weight: 500; color: var(--muted); font-size: .8rem; }
+.tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.tab[aria-pressed="true"] b { color: inherit; }
+.alerts { display: grid; gap: 6px; }
+.alert { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-radius: 8px; padding: 9px 14px; font-size: .9rem; font-weight: 500; }
+.alert.today { background: var(--off-bg); color: var(--off); }
+.alert.tomorrow { background: var(--hold-bg); color: var(--hold); }
+.alert.alarm { background: var(--accent-soft); color: var(--accent); }
+.alert button { margin-inline-start: auto; border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 6px; padding: 3px 12px; font-size: .82rem; }
+
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 6px; }
+.row { display: grid; grid-template-columns: 44px 150px 190px minmax(0,1fr) 118px 112px 118px; gap: 12px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--line); }
+.row:first-child { border-top: 0; }
+.row.head { background: var(--accent-soft); color: var(--muted); font-size: .78rem; font-weight: 600; padding-block: 8px; }
+.row.group { display: flex; gap: 10px; align-items: center; background: var(--bg); font-weight: 600; font-size: .85rem; padding-block: 7px; }
+.row.group span.n { font-family: var(--mono); color: var(--muted); font-weight: 400; }
+.row.due { background: color-mix(in srgb, var(--hold-bg) 55%, transparent); }
+.num { font-family: var(--mono); direction: ltr; text-align: right; font-size: .9rem; }
+.idx { color: var(--muted); font-size: .8rem; }
+.sim { color: var(--muted); font-size: .78rem; overflow-wrap: anywhere; }
+.name { overflow-wrap: anywhere; }
+.name small { display: block; color: var(--muted); font-size: .75rem; }
+.note { display: block; color: var(--muted); font-size: .78rem; margin-top: 2px; overflow-wrap: anywhere; }
+.date { font-family: var(--mono); font-size: .85rem; direction: ltr; text-align: right; }
+.date small { display: block; color: var(--muted); font-family: var(--font); font-size: .72rem; direction: rtl; text-align: right; }
+.pill { display: inline-block; padding: 2px 11px; border-radius: 999px; font-size: .8rem; font-weight: 600; white-space: nowrap; }
+.pill.active { background: var(--on-bg); color: var(--on); }
+.pill.suspended { background: var(--hold-bg); color: var(--hold); }
+.pill.disconnected { background: var(--off-bg); color: var(--off); }
+.c-edit { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; row-gap: 4px; }
+.edit { border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 4px 10px; font-size: .82rem; color: var(--accent); }
+.wa { display: inline-block; border: 1px solid var(--on); color: var(--on); border-radius: 6px; padding: 4px 10px; font-size: .82rem; text-decoration: none; margin-inline-end: 6px; }
+.empty { padding: 36px 16px; text-align: center; color: var(--muted); }
+.more { display: flex; justify-content: center; padding: 14px; }
+
+@media (max-width: 760px) {
+  .row.head { display: none; }
+  .row { grid-template-columns: minmax(0,1fr) auto; grid-template-areas: "phone status" "name name" "sim sim" "date edit"; row-gap: 4px; padding: 12px 14px; }
+  .row .idx { display: none; }
+  .row .c-phone { grid-area: phone; } .row .c-status { grid-area: status; justify-self: end; }
+  .row .c-name { grid-area: name; } .row .c-sim { grid-area: sim; }
+  .row .c-date { grid-area: date; } .row .c-edit { grid-area: edit; justify-self: end; }
+}
+
+.overlay { position: fixed; inset: 0; z-index: 20; background: rgba(8,18,26,.55); display: flex; align-items: center; justify-content: center; padding: 14px; }
+.overlay[hidden] { display: none; }
+.dlg { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); width: 100%; max-width: 440px; max-height: 100%; overflow-y: auto; padding: 18px; display: grid; gap: 12px; }
+.dlg h2 { margin: 0; font-size: 1.1rem; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: .82rem; color: var(--muted); font-weight: 500; }
+.field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 9px 12px; }
+.field textarea { min-height: 70px; resize: vertical; }
+.field input.ltr { direction: ltr; text-align: right; font-family: var(--mono); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.two[hidden] { display: none; }
+.alarmbox { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 10px; background: var(--bg); }
+.chk { display: flex; gap: 8px; align-items: center; font-weight: 500; }
+.chk input { width: 18px; height: 18px; accent-color: var(--accent); }
+.err { color: var(--danger); font-size: .85rem; min-height: 1.2em; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.actions .spacer { flex: 1; }
+.hint { color: var(--muted); font-size: .8rem; margin: 0; }
+.toast { position: fixed; inset-inline: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); margin-inline: auto; width: fit-content; max-width: 100%; background: var(--fg); color: var(--bg); padding: 10px 18px; border-radius: 8px; z-index: 30; font-size: .9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="titlebar">
+      <div>
+        <h1>سجل الشرائح</h1>
+        <div class="sub" id="summary"></div>
+      </div>
+      <div class="btns">
+        <button class="btn" id="setBtn" type="button" aria-label="الإعدادات">الإعدادات</button>
+        <button class="btn primary" id="addBtn" type="button">+ إضافة</button>
+      </div>
+    </div>
+    <div class="alerts" id="alerts"></div>
+    <div class="search"><input id="q" type="search" inputmode="search" autocomplete="off" placeholder="ابحث برقم الهاتف أو رقم الشريحة أو جزء منهما، أو باسم الزبون" aria-label="بحث"></div>
+    <div class="tabs" id="tabs" role="group" aria-label="تصفية حسب الحالة"></div>
+  </header>
+  <main><div class="list" id="list" aria-live="polite"></div></main>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <form class="dlg" id="form" novalidate>
+    <h2 id="dlgTitle">إضافة شريحة</h2>
+    <div class="field"><label for="f-name">اسم الزبون</label><input id="f-name" type="text" autocomplete="off"></div>
+    <div class="two">
+      <div class="field"><label for="f-phone">رقم الهاتف</label><input id="f-phone" class="ltr" type="text" inputmode="numeric" autocomplete="off" placeholder="05XXXXXXXX"></div>
+      <div class="field"><label for="f-company">الشركة</label>
+        <select id="f-company"><option value="">غير محددة</option><option>سلكوم</option><option>هوت</option><option>بلفون</option><option>بارتنر</option><option>رامي ليفي</option><option>019</option><option>وي</option></select>
+      </div>
+    </div>
+    <div class="field"><label for="f-sim">رقم الشريحة</label><input id="f-sim" class="ltr" type="text" inputmode="numeric" autocomplete="off" placeholder="8997…"></div>
+    <div class="field"><label for="f-place">مكان التفعيل</label><input id="f-place" type="text" autocomplete="off" placeholder="مثال: المحل، البيت، اسم الشخص أو المنطقة"></div>
+    <div class="field"><label for="f-wa">رقم التواصل واتساب</label><input id="f-wa" class="ltr" type="text" inputmode="tel" autocomplete="off" placeholder="05XXXXXXXX أو 972XXXXXXXXX"></div>
+    <div class="two">
+      <div class="field"><label for="f-status">الحالة</label>
+        <select id="f-status"><option value="active">مفعل</option><option value="suspended">معلق</option><option value="disconnected">مفصول</option></select>
+      </div>
+      <div class="field"><label for="f-date">تاريخ الفصل / القطع</label><input id="f-date" type="date"></div>
+    </div>
+    <div class="alarmbox">
+      <label class="chk" for="f-alarm-on"><input id="f-alarm-on" type="checkbox"> تفعيل المنبه</label>
+      <div class="two" id="alarmRow" hidden>
+        <div class="field"><label for="f-alarm-date">تاريخ المنبه</label><input id="f-alarm-date" type="date"></div>
+        <div class="field"><label for="f-alarm-time">الساعة</label><input id="f-alarm-time" type="time" value="09:00"></div>
+      </div>
+    </div>
+    <div class="field"><label for="f-notes">ملاحظات</label><textarea id="f-notes" placeholder="أي ملاحظة عن الشريحة أو الزبون"></textarea></div>
+    <div class="err" id="err" role="alert"></div>
+    <div class="actions">
+      <button class="btn primary" type="submit" id="saveBtn">حفظ</button>
+      <button class="btn" type="button" id="cancelBtn">إلغاء</button>
+      <span class="spacer"></span>
+      <button class="btn danger" type="button" id="delBtn" hidden>حذف</button>
+    </div>
+  </form>
+</div>
+
+<div class="overlay" id="setOverlay" hidden>
+  <div class="dlg">
+    <h2>الإعدادات</h2>
+    <div class="field">
+      <label for="s-hour">ساعة إشعارات الفصل (قبل الفصل بيوم ويوم الفصل)</label>
+      <select id="s-hour"></select>
+    </div>
+    <p class="hint">الإشعارات تصل من الهاتف نفسه حتى لو كان التطبيق مغلقًا ولا تحتاج إنترنت.</p>
+    <div class="field">
+      <label>مشاركة البيانات مع جهاز آخر</label>
+      <div class="btns">
+        <button class="btn" type="button" id="expBtn">تصدير نسخة</button>
+        <button class="btn" type="button" id="impBtn">استيراد ودمج</button>
+      </div>
+      <input id="impFile" type="file" accept=".json,application/json" hidden>
+      <p class="hint">صدّر النسخة وأرسلها لجهاز آخر (واتساب أو غيره) ثم استوردها هناك. يؤخذ الأحدث تعديلًا لكل سجل.</p>
+    </div>
+    <div class="err" id="setMsg" role="status"></div>
+    <div class="actions"><button class="btn primary" type="button" id="setClose">إغلاق</button></div>
+  </div>
+</div>
+
+<script src="seed.js"></script>
+<script>
+(function () {
+  var STATUS = { active: "مفعل", suspended: "معلق", disconnected: "مفصول" };
+  var ORDER = ["active", "suspended", "disconnected"];
+  var PAGE = 80, KEY = "sims_v1", TOMB = "sims_deleted_v1", SET = "sims_settings_v1";
+  var Cap = window.Capacitor, P = (Cap && Cap.Plugins) || {};
+  var LN = P.LocalNotifications, FS = P.Filesystem, SH = P.Share;
+
+  var docs = new Map(), tomb = {}, settings = { hour: 9 };
+  var filter = "all", query = "", shown = PAGE, editingId = null, delArmed = false;
+  var $ = function (id) { return document.getElementById(id); };
+  var listEl = $("list"), tabsEl = $("tabs"), summaryEl = $("summary");
+
+  // ---------- helpers
+  function toLatin(s) { return String(s || "").replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 0x660; }).replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 0x6f0; }); }
+  function digits(s) { return toLatin(s).replace(/\D/g, ""); }
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function fmtDate(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); return m ? m[3] + "/" + m[2] + "/" + m[1] : "—"; }
+  function daysFrom(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); if (!m) return null;
+    var t = new Date(), a = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
+    return Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - a) / 86400000);
+  }
+  function dayNote(r) {
+    var d = daysFrom(r.cutDate); if (d === null) return "";
+    if (r.status === "active") return d > 0 ? "باقي " + d + " يوم" : d === 0 ? "ينتهي اليوم" : "انتهى منذ " + (-d) + " يوم";
+    return "منذ " + Math.abs(d) + " يوم";
+  }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function toast(msg) { var t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600); }
+  function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h % 2000000000) + 1; }
+  function newId() { return "n" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  // ---------- storage (works with no internet)
+  function readJSON(k, fb) { try { var s = localStorage.getItem(k); return s ? JSON.parse(s) : fb; } catch (e) { return fb; } }
+  function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function loadAll() {
+    var arr = readJSON(KEY, null), sv = window.SEED_VERSION || "0", seen = null;
+    try { seen = localStorage.getItem("sims_seed_ver"); } catch (e) {}
+    if (!arr || seen !== sv) {
+      // new built-in data set: replace everything stored on this device
+      arr = (window.SEED || []).slice(); writeJSON(KEY, arr); writeJSON(TOMB, {});
+      try { localStorage.setItem("sims_seed_ver", sv); } catch (e) {}
+    }
+    arr.forEach(function (r) { docs.set(r._id, r); });
+    tomb = readJSON(TOMB, {});
+    var s = readJSON(SET, null); if (s && typeof s.hour === "number") settings = s;
+  }
+  function persist() {
+    var ok = writeJSON(KEY, Array.from(docs.values())) && writeJSON(TOMB, tomb);
+    if (!ok) toast("تعذر الحفظ على الجهاز. المساحة ممتلئة.");
+    scheduleNotifs();
+  }
+
+  // ---------- sorting / search
+  function sorted(arr) {
+    return arr.sort(function (a, b) {
+      var sa = ORDER.indexOf(a.status), sb = ORDER.indexOf(b.status);
+      if (sa !== sb) return sa - sb;
+      var da = a.cutDate || "", db = b.cutDate || "";
+      if (a.status === "disconnected") return da < db ? 1 : da > db ? -1 : 0;
+      return da < db ? -1 : da > db ? 1 : 0;
+    });
+  }
+  function dueDays(r) {
+    if (r.status === "disconnected") return null;
+    var d = daysFrom(r.cutDate); return d === 0 || d === 1 ? d : null;
+  }
+  function alarmDue(r) {
+    if (!r.alarmOn || r.alarmDone || !r.alarmAt) return false;
+    var t = new Date(r.alarmAt).getTime(); return !isNaN(t) && Date.now() >= t;
+  }
+  function matches(r) {
+    if (filter === "due") { if (dueDays(r) === null) return false; }
+    else if (filter !== "all" && r.status !== filter) return false;
+    var raw = query.trim(); if (!raw) return true;
+    var d = digits(raw), plain = /^[\d\s\-+()٠-٩۰-۹]+$/.test(raw);
+    if (plain && d) {
+      if ((r.phone || "").indexOf(d) !== -1 || (r.sim || "").indexOf(d) !== -1) return true;
+      if (d[0] === "0" && (r.phone || "").indexOf(d.slice(1)) !== -1) return true;
+      return false;
+    }
+    var hay = [r.name, r.phone, r.sim, r.company, r.place, r.notes].join(" ").toLowerCase();
+    return hay.indexOf(raw.toLowerCase()) !== -1;
+  }
+  function waLink(r) {
+    var n = digits(r.wa); if (!n) return "";
+    if (n.charAt(0) === "0") n = "972" + n.slice(1);
+    return '<a class="wa" href="https://wa.me/' + n + '" target="_blank" rel="noopener">واتساب</a>';
+  }
+
+  // ---------- render
+  function renderAlerts(all) {
+    var today = all.filter(function (r) { return dueDays(r) === 0; }).length;
+    var tmr = all.filter(function (r) { return dueDays(r) === 1; }).length, h = "";
+    all.filter(alarmDue).forEach(function (r) {
+      var p = r.alarmAt.split("T");
+      h += '<div class="alert alarm"><span>⏰ منبه: ' + esc(r.name || r.phone) + " · " + esc(r.phone) + " · " + fmtDate(p[0]) + " " + esc(p[1] || "") + '</span><button type="button" data-ack="' + esc(r._id) + '">تم</button></div>';
+    });
+    if (today) h += '<div class="alert today"><span>تنبيه: ' + today + ' شريحة موعد فصلها اليوم</span><button type="button" data-due="1">عرض</button></div>';
+    if (tmr) h += '<div class="alert tomorrow"><span>تنبيه: ' + tmr + ' شريحة موعد فصلها غدًا</span><button type="button" data-due="1">عرض</button></div>';
+    $("alerts").innerHTML = h;
+  }
+  function renderTabs(all) {
+    var c = { all: all.length, active: 0, suspended: 0, disconnected: 0, due: 0 };
+    all.forEach(function (r) { c[r.status] = (c[r.status] || 0) + 1; if (dueDays(r) !== null) c.due++; });
+    var defs = [["all", "الكل"], ["active", "مفعل"], ["suspended", "معلق"], ["disconnected", "مفصول"]];
+    if (c.due) defs.push(["due", "تنبيهات"]);
+    if (filter === "due" && !c.due) filter = "all";
+    tabsEl.innerHTML = defs.map(function (t) { return '<button type="button" class="tab" data-f="' + t[0] + '" aria-pressed="' + (filter === t[0]) + '">' + t[1] + " <b>" + (c[t[0]] || 0) + "</b></button>"; }).join("");
+    summaryEl.textContent = all.length ? "إجمالي " + all.length + " شريحة · مرتبة: مفعل ثم معلق ثم مفصول" : "لا توجد شرائح بعد";
+  }
+  function render() {
+    var all = Array.from(docs.values());
+    renderTabs(all); renderAlerts(all);
+    var rows = sorted(all.filter(matches));
+    if (!rows.length) { listEl.innerHTML = '<div class="empty">' + (all.length ? "لا توجد نتائج مطابقة للبحث." : "لا توجد شرائح. اضغط «إضافة» لإدخال أول سجل.") + "</div>"; return; }
+    var out = ['<div class="row head"><span>#</span><span>رقم الهاتف</span><span>رقم الشريحة</span><span>اسم الزبون</span><span>تاريخ الفصل</span><span>الحالة</span><span></span></div>'];
+    var last = null, i = 0, counts = {};
+    rows.forEach(function (r) { counts[r.status] = (counts[r.status] || 0) + 1; });
+    rows.slice(0, shown).forEach(function (r) {
+      if (filter === "all" && r.status !== last) { last = r.status; out.push('<div class="row group"><span class="pill ' + r.status + '">' + STATUS[r.status] + '</span><span class="n">' + counts[r.status] + "</span></div>"); }
+      i++;
+      var sub = [r.company, r.place ? "📍 " + r.place : "", r.alarmOn && r.alarmAt ? "⏰ " + fmtDate(r.alarmAt.split("T")[0]) + " " + (r.alarmAt.split("T")[1] || "") : ""].filter(Boolean).map(esc).join(" · ");
+      out.push('<div class="row' + (dueDays(r) !== null ? " due" : "") + '">' +
+        '<span class="idx num">' + i + "</span>" +
+        '<span class="c-phone num">' + esc(r.phone) + "</span>" +
+        '<span class="c-sim num sim">' + esc(r.sim || "—") + "</span>" +
+        '<span class="c-name name">' + esc(r.name || "—") + (sub ? "<small>" + sub + "</small>" : "") + (r.notes ? '<span class="note">' + esc(r.notes) + "</span>" : "") + "</span>" +
+        '<span class="c-date date">' + fmtDate(r.cutDate) + "<small>" + dayNote(r) + "</small></span>" +
+        '<span class="c-status"><span class="pill ' + r.status + '">' + STATUS[r.status] + "</span></span>" +
+        '<span class="c-edit">' + waLink(r) + '<button type="button" class="edit" data-id="' + esc(r._id) + '">تعديل</button></span></div>');
+    });
+    if (rows.length > shown) out.push('<div class="more"><button class="btn" type="button" id="moreBtn">عرض المزيد (' + (rows.length - shown) + ")</button></div>");
+    listEl.innerHTML = out.join("");
+  }
+
+  // ---------- local notifications (phone fires them, no internet needed)
+  var schedTimer;
+  function scheduleNotifs() { clearTimeout(schedTimer); schedTimer = setTimeout(doSchedule, 400); }
+  async function doSchedule() {
+    if (!LN) return;
+    try {
+      var perm = await LN.checkPermissions();
+      if (perm.display !== "granted") perm = await LN.requestPermissions();
+      if (perm.display !== "granted") return;
+      var pend = await LN.getPending();
+      if (pend.notifications && pend.notifications.length) await LN.cancel({ notifications: pend.notifications });
+      var list = [], now = Date.now(), h = settings.hour;
+      docs.forEach(function (r) {
+        var who = (r.name || r.phone) + " · " + r.phone;
+        if (r.status !== "disconnected" && /^\d{4}-\d{2}-\d{2}$/.test(r.cutDate || "")) {
+          var p = r.cutDate.split("-").map(Number);
+          var day = new Date(p[0], p[1] - 1, p[2], h, 0, 0), before = new Date(p[0], p[1] - 1, p[2] - 1, h, 0, 0);
+          if (before.getTime() > now) list.push({ id: hash(r._id + "b"), title: "فصل شريحة غدًا", body: who, schedule: { at: before, allowWhileIdle: true } });
+          if (day.getTime() > now) list.push({ id: hash(r._id + "d"), title: "فصل شريحة اليوم", body: who, schedule: { at: day, allowWhileIdle: true } });
+        }
+        if (r.alarmOn && !r.alarmDone && r.alarmAt) {
+          var at = new Date(r.alarmAt);
+          if (!isNaN(at) && at.getTime() > now) list.push({ id: hash(r._id + "a"), title: "منبه", body: who + (r.notes ? " — " + r.notes : ""), schedule: { at: at, allowWhileIdle: true } });
+        }
+      });
+      list.sort(function (a, b) { return a.schedule.at - b.schedule.at; });
+      if (list.length) await LN.schedule({ notifications: list.slice(0, 450) });
+    } catch (e) {}
+  }
+
+  // ---------- add / edit dialog
+  function openDlg(id) {
+    editingId = id; delArmed = false;
+    var r = id ? docs.get(id) : null;
+    $("dlgTitle").textContent = r ? "تعديل الشريحة" : "إضافة شريحة";
+    $("f-name").value = r ? r.name || "" : ""; $("f-phone").value = r ? r.phone || "" : "";
+    $("f-sim").value = r ? r.sim || "" : ""; $("f-company").value = r ? r.company || "" : "";
+    $("f-place").value = r ? r.place || "" : ""; $("f-wa").value = r ? r.wa || "" : "";
+    $("f-status").value = r ? r.status : "active"; $("f-date").value = r ? r.cutDate || "" : "";
+    $("f-notes").value = r ? r.notes || "" : "";
+    var at = r && r.alarmAt ? r.alarmAt.split("T") : ["", "09:00"];
+    $("f-alarm-on").checked = !!(r && r.alarmOn); $("f-alarm-date").value = at[0] || ""; $("f-alarm-time").value = at[1] || "09:00";
+    $("alarmRow").hidden = !$("f-alarm-on").checked;
+    $("err").textContent = "";
+    var del = $("delBtn"); del.hidden = !r; del.textContent = "حذف"; del.classList.remove("armed");
+    $("overlay").hidden = false; $("f-name").focus();
+  }
+  function closeDlg() { $("overlay").hidden = true; editingId = null; }
+
+  $("f-alarm-on").addEventListener("change", function () {
+    var on = $("f-alarm-on").checked; $("alarmRow").hidden = !on;
+    if (on && !$("f-alarm-date").value) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec($("f-date").value || ""), d = m ? new Date(+m[1], +m[2] - 1, +m[3] - 1) : new Date();
+      $("f-alarm-date").value = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+    }
+  });
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var phone = digits($("f-phone").value);
+    if (phone.length < 9) { $("err").textContent = "أدخل رقم هاتف صحيحًا."; $("f-phone").focus(); return; }
+    var dup = Array.from(docs.values()).find(function (r) { return r.phone === phone && r._id !== editingId; });
+    if (dup) { $("err").textContent = "رقم الهاتف مسجل مسبقًا باسم: " + (dup.name || "بدون اسم"); return; }
+    var alarmOn = $("f-alarm-on").checked, adate = $("f-alarm-date").value, atime = $("f-alarm-time").value || "09:00";
+    if (alarmOn && !adate) { $("err").textContent = "اختر تاريخ المنبه."; return; }
+    var id = editingId || newId();
+    var rec = Object.assign({}, docs.get(id) || {}, {
+      _id: id, phone: phone, sim: digits($("f-sim").value), name: $("f-name").value.trim(), company: $("f-company").value,
+      place: $("f-place").value.trim(), wa: digits($("f-wa").value), notes: $("f-notes").value.trim(),
+      status: $("f-status").value, cutDate: $("f-date").value,
+      alarmOn: alarmOn, alarmAt: alarmOn ? adate + "T" + atime : "", alarmDone: false, updatedAt: new Date().toISOString()
+    });
+    docs.set(id, rec); delete tomb[id]; persist(); closeDlg(); render();
+    toast(editingId ? "تم حفظ التعديل" : "تمت إضافة الشريحة");
+  });
+  $("delBtn").addEventListener("click", function () {
+    var b = $("delBtn");
+    if (!delArmed) { delArmed = true; b.textContent = "تأكيد الحذف"; b.classList.add("armed"); return; }
+    docs.delete(editingId); tomb[editingId] = new Date().toISOString(); persist(); closeDlg(); render(); toast("تم حذف السجل");
+  });
+
+  // ---------- list events
+  var t0;
+  $("q").addEventListener("input", function (e) { clearTimeout(t0); var v = e.target.value; t0 = setTimeout(function () { query = v; shown = PAGE; render(); }, 120); });
+  tabsEl.addEventListener("click", function (e) { var b = e.target.closest(".tab"); if (!b) return; filter = b.dataset.f; shown = PAGE; render(); });
+  listEl.addEventListener("click", function (e) {
+    if (e.target.id === "moreBtn") { shown += PAGE; render(); return; }
+    var b = e.target.closest(".edit"); if (b) openDlg(b.dataset.id);
+  });
+  $("alerts").addEventListener("click", function (e) {
+    if (e.target.closest("[data-due]")) { filter = "due"; shown = PAGE; render(); return; }
+    var a = e.target.closest("[data-ack]");
+    if (a) { var r = docs.get(a.dataset.ack); if (r) { r.alarmDone = true; r.updatedAt = new Date().toISOString(); persist(); render(); } }
+  });
+  $("addBtn").addEventListener("click", function () { openDlg(null); });
+  $("cancelBtn").addEventListener("click", closeDlg);
+  $("overlay").addEventListener("mousedown", function (e) { if (e.target === $("overlay")) closeDlg(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeDlg(); $("setOverlay").hidden = true; } });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) render(); });
+
+  // in-app alarm sound while the app is open
+  var beeped = {};
+  function beep() {
+    try { var C = window.AudioContext || window.webkitAudioContext, ctx = new C(), o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.value = 0.15; o.start(); o.stop(ctx.currentTime + 0.6); } catch (x) {}
+    try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (x) {}
+  }
+  setInterval(function () {
+    var fresh = false;
+    docs.forEach(function (r, id) { if (alarmDue(r) && !beeped[id]) { beeped[id] = 1; fresh = true; } });
+    if (fresh) beep();
+    render();
+  }, 30000);
+
+  // ---------- settings, export / import
+  var hs = $("s-hour");
+  for (var hh = 0; hh < 24; hh++) { var o = document.createElement("option"); o.value = hh; o.textContent = pad(hh) + ":00"; hs.appendChild(o); }
+  $("setBtn").addEventListener("click", function () { hs.value = settings.hour; $("setMsg").textContent = ""; $("setOverlay").hidden = false; });
+  $("setClose").addEventListener("click", function () { $("setOverlay").hidden = true; });
+  $("setOverlay").addEventListener("mousedown", function (e) { if (e.target === $("setOverlay")) $("setOverlay").hidden = true; });
+  hs.addEventListener("change", function () { settings.hour = +hs.value; writeJSON(SET, settings); scheduleNotifs(); $("setMsg").textContent = "تم حفظ الساعة."; });
+
+  $("expBtn").addEventListener("click", async function () {
+    var d = new Date(), name = "sims-" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "-" + pad(d.getHours()) + pad(d.getMinutes()) + ".json";
+    var data = JSON.stringify({ v: 1, exportedAt: d.toISOString(), records: Array.from(docs.values()), deleted: tomb });
+    try {
+      if (FS && SH) { var w = await FS.writeFile({ path: name, data: data, directory: "CACHE", encoding: "utf8" }); await SH.share({ title: name, url: w.uri }); }
+      else { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "application/json" })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+      $("setMsg").textContent = "تم تجهيز النسخة.";
+    } catch (x) { $("setMsg").textContent = "تعذر التصدير."; }
+  });
+  $("impBtn").addEventListener("click", function () { $("impFile").click(); });
+  $("impFile").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      try {
+        var j = JSON.parse(fr.result), added = 0, updated = 0, removed = 0;
+        (j.records || []).forEach(function (r) {
+          if (!r || !r._id) return;
+          var loc = docs.get(r._id), tl = tomb[r._id];
+          if (tl && (r.updatedAt || "") <= tl) return;
+          if (!loc) { docs.set(r._id, r); delete tomb[r._id]; added++; }
+          else if ((r.updatedAt || "") > (loc.updatedAt || "")) { docs.set(r._id, r); updated++; }
+        });
+        Object.keys(j.deleted || {}).forEach(function (id) {
+          var loc = docs.get(id), t = j.deleted[id];
+          if (loc && t > (loc.updatedAt || "")) { docs.delete(id); removed++; }
+          if (!tomb[id] || t > tomb[id]) tomb[id] = t;
+        });
+        persist(); render();
+        $("setMsg").textContent = "تم الدمج: " + added + " جديد، " + updated + " محدّث، " + removed + " محذوف.";
+      } catch (x) { $("setMsg").textContent = "الملف غير صالح."; }
+      $("impFile").value = "";
+    };
+    fr.readAsText(f);
+  });
+
+  loadAll(); render(); scheduleNotifs();
+})();
+</script>
+</body>
+</html>
