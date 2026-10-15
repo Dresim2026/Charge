@@ -4,513 +4,1051 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>سجل الشرائح</title>
+<title>إدارة الشرائح — نظيفة ومستعملة</title>
 <style>
 :root {
-  --bg: #f3f5f7; --surface: #ffffff; --fg: #16202a; --muted: #5d6b79; --line: #dbe1e7;
-  --accent: #0b5f7a; --accent-fg: #ffffff; --accent-soft: #dcecf2;
-  --on: #136b3a; --on-bg: #dcf1e4; --hold: #8a5a00; --hold-bg: #fbecc8; --off: #a12b2b; --off-bg: #f9dede;
-  --danger: #b3261e; --shadow: 0 10px 40px rgba(10,30,45,.22);
+  --bg: #0d1419; --surface: #161f28; --surface-card: #1c2733; --surface-2: #22303d;
+  --fg: #e6edf3; --muted: #8b9aab; --line: #2a3846;
+  --accent: #4fb3d1; --accent-fg: #062029; --accent-soft: #14323d;
+  --on: #6fd49a; --on-bg: #14341f; --hold: #f0c261; --hold-bg: #3a2c0c; --off: #f08a8a; --off-bg: #3d1a1a;
+  --danger: #f2877f; --gold: #e8b64a; --gold-bg: #3a2e0c;
+  --purple: #a892e8; --purple-bg: #2a2340;
+  --shadow: 0 12px 36px rgba(0,0,0,.55);
   --font: system-ui, "Segoe UI", Roboto, Tahoma, sans-serif;
   --mono: ui-monospace, Consolas, "Roboto Mono", monospace;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f161c; --surface: #172029; --fg: #e6edf3; --muted: #93a2b1; --line: #263440;
-    --accent: #4fb3d1; --accent-fg: #062029; --accent-soft: #14323d;
-    --on: #6fd49a; --on-bg: #14341f; --hold: #f0c261; --hold-bg: #3a2c0c; --off: #f08a8a; --off-bg: #3d1a1a;
-    --danger: #f2877f; --shadow: 0 10px 40px rgba(0,0,0,.6);
-  }
+:root[data-theme="light"] {
+  --bg: #eef2f7; --surface: #ffffff; --surface-card: #ffffff; --surface-2: #f5f8fb;
+  --fg: #16212b; --muted: #5d6d7c; --line: #d9e2ec;
+  --accent: #0e7fa8; --accent-fg: #ffffff; --accent-soft: #dff1f8;
+  --on: #187a47; --on-bg: #ddf5e6; --hold: #8a6100; --hold-bg: #fdf2d4; --off: #b0332f; --off-bg: #fce4e3;
+  --danger: #c0392b; --gold: #a57300; --gold-bg: #fdf3d6;
+  --purple: #6b4fbf; --purple-bg: #ece7fa;
+  --shadow: 0 12px 36px rgba(15,30,50,.14);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { color-scheme: light dark; }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5;
-  padding-inline: 14px; padding-block: env(safe-area-inset-top, 0px) calc(40px + env(safe-area-inset-bottom, 0px)); }
-.wrap { max-width: 1040px; margin-inline: auto; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; padding: 14px; padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+.wrap { max-width: 900px; margin: 0 auto; }
 button, input, select, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; }
+button { cursor: pointer; border: none; background: none; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-header.top { position: sticky; top: 0; z-index: 5; background: var(--bg); padding-block: 14px 8px; display: grid; gap: 10px; }
+header.top { position: sticky; top: 0; z-index: 10; background: var(--bg); padding-block: 8px 12px; display: grid; gap: 10px; }
 .titlebar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.title-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 h1 { margin: 0; font-size: 1.3rem; font-weight: 700; }
-.sub { color: var(--muted); font-size: .82rem; }
-.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 9px 14px; font-weight: 500; }
+.sub { color: var(--muted); font-size: .76rem; margin-top: 1px; }
+.btns { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.icon-btn { width: 42px; height: 42px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: var(--fg); position: relative; }
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn.accent { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.icon-btn .dot { position: absolute; top: -3px; inset-inline-end: -3px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--danger); color: #fff; font-size: .65rem; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg); }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 12px; font-weight: 500; font-size: .85rem; white-space: nowrap; transition: all .15s ease; }
+.btn:hover { border-color: var(--accent); }
 .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
-.btn.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
-.btn.danger.armed { background: var(--danger); color: var(--surface); }
-.btns { display: flex; gap: 8px; }
-.search input { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 11px 14px; font-size: 1rem; }
-.search input::placeholder { color: var(--muted); }
-.tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
-.tab { flex: 0 0 auto; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; display: inline-flex; gap: 8px; align-items: baseline; font-size: .9rem; }
-.tab b { font-family: var(--mono); font-weight: 500; color: var(--muted); font-size: .8rem; }
-.tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-.tab[aria-pressed="true"] b { color: inherit; }
-.alerts { display: grid; gap: 6px; }
-.alert { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-radius: 8px; padding: 9px 14px; font-size: .9rem; font-weight: 500; }
-.alert.today { background: var(--off-bg); color: var(--off); }
-.alert.tomorrow { background: var(--hold-bg); color: var(--hold); }
-.alert.alarm { background: var(--accent-soft); color: var(--accent); }
-.alert button { margin-inline-start: auto; border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 6px; padding: 3px 12px; font-size: .82rem; }
+.btn.danger { color: var(--danger); border-color: var(--danger); }
+.btn.gold { background: var(--gold); color: #2a1f00; border-color: var(--gold); font-weight: 700; }
+.btn.purple { background: var(--purple); color: #fff; border-color: var(--purple); font-weight: 600; }
+.btn.on { background: var(--on); color: #0a2415; border-color: var(--on); font-weight: 700; }
+.btn.sm { padding: 5px 10px; font-size: .78rem; }
 
-.list { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 6px; }
-.row { display: grid; grid-template-columns: 44px 150px 190px minmax(0,1fr) 118px 112px 118px; gap: 12px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--line); }
-.row:first-child { border-top: 0; }
-.row.head { background: var(--accent-soft); color: var(--muted); font-size: .78rem; font-weight: 600; padding-block: 8px; }
-.row.group { display: flex; gap: 10px; align-items: center; background: var(--bg); font-weight: 600; font-size: .85rem; padding-block: 7px; }
-.row.group span.n { font-family: var(--mono); color: var(--muted); font-weight: 400; }
-.row.due { background: color-mix(in srgb, var(--hold-bg) 55%, transparent); }
-.num { font-family: var(--mono); direction: ltr; text-align: right; font-size: .9rem; }
-.idx { color: var(--muted); font-size: .8rem; }
-.sim { color: var(--muted); font-size: .78rem; overflow-wrap: anywhere; }
-.name { overflow-wrap: anywhere; }
-.name small { display: block; color: var(--muted); font-size: .75rem; }
-.note { display: block; color: var(--muted); font-size: .78rem; margin-top: 2px; overflow-wrap: anywhere; }
-.date { font-family: var(--mono); font-size: .85rem; direction: ltr; text-align: right; }
-.date small { display: block; color: var(--muted); font-family: var(--font); font-size: .72rem; direction: rtl; text-align: right; }
-.pill { display: inline-block; padding: 2px 11px; border-radius: 999px; font-size: .8rem; font-weight: 600; white-space: nowrap; }
-.pill.active { background: var(--on-bg); color: var(--on); }
-.pill.suspended { background: var(--hold-bg); color: var(--hold); }
-.pill.disconnected { background: var(--off-bg); color: var(--off); }
-.c-edit { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; row-gap: 4px; }
-.edit { border: 1px solid var(--line); background: transparent; border-radius: 6px; padding: 4px 10px; font-size: .82rem; color: var(--accent); }
-.wa { display: inline-block; border: 1px solid var(--on); color: var(--on); border-radius: 6px; padding: 4px 10px; font-size: .82rem; text-decoration: none; margin-inline-end: 6px; }
-.empty { padding: 36px 16px; text-align: center; color: var(--muted); }
-.more { display: flex; justify-content: center; padding: 14px; }
+/* ===== MAIN TABS ===== */
+.main-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.main-tabs::-webkit-scrollbar { display: none; }
+.main-tab {
+  flex: 0 0 auto; border: 1px solid var(--line); background: var(--surface); border-radius: 12px;
+  padding: 9px 15px; display: inline-flex; gap: 8px; align-items: center;
+  font-size: .88rem; font-weight: 600; color: var(--muted); transition: all .15s ease;
+}
+.main-tab .mt-icon { font-size: 1.05rem; }
+.main-tab b { font-family: var(--mono); font-size: .76rem; background: var(--bg); border: 1px solid var(--line); padding: 1px 8px; border-radius: 999px; color: var(--fg); }
+.main-tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.main-tab[aria-pressed="true"] b { color: var(--accent-fg); background: rgba(0,0,0,.15); border-color: transparent; }
+.main-tab.clean-tab[aria-pressed="true"] { background: var(--on); color: #08210f; border-color: var(--on); }
+.main-tab.used-tab[aria-pressed="true"] { background: var(--hold); color: #2a1f00; border-color: var(--hold); }
 
-@media (max-width: 760px) {
-  .row.head { display: none; }
-  .row { grid-template-columns: minmax(0,1fr) auto; grid-template-areas: "phone status" "name name" "sim sim" "date edit"; row-gap: 4px; padding: 12px 14px; }
-  .row .idx { display: none; }
-  .row .c-phone { grid-area: phone; } .row .c-status { grid-area: status; justify-self: end; }
-  .row .c-name { grid-area: name; } .row .c-sim { grid-area: sim; }
-  .row .c-date { grid-area: date; } .row .c-edit { grid-area: edit; justify-self: end; }
+.search { position: relative; }
+.search input { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 11px 42px 11px 16px; font-size: .95rem; color: var(--fg); }
+.search .search-icon { position: absolute; inset-inline-end: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search .clear-btn { position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; color: var(--muted); display: none; align-items: center; justify-content: center; font-size: .9rem; }
+.search .clear-btn.show { display: flex; }
+
+/* ===== STATS ===== */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+.stat-card {
+  background: var(--surface-card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 11px 13px; display: grid; gap: 3px; position: relative; overflow: hidden;
+}
+.stat-card::before { content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+.stat-card.clean::before { background: var(--on); }
+.stat-card.used::before { background: var(--hold); }
+.stat-card .sc-num { font-family: var(--mono); font-size: 1.45rem; font-weight: 800; line-height: 1.1; }
+.stat-card.clean .sc-num { color: var(--on); }
+.stat-card.used .sc-num { color: var(--hold); }
+.stat-card .sc-lbl { font-size: .72rem; color: var(--muted); font-weight: 600; }
+
+/* ===== GRID ===== */
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px; margin-top: 12px;
+}
+.tile {
+  background: var(--surface-card); border: 1px solid var(--line); border-radius: 13px;
+  padding: 12px 13px; display: grid; gap: 8px; position: relative;
+  animation: cardIn .22s ease both;
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tile.clean { border-inline-start: 4px solid var(--on); }
+.tile.used  { border-inline-start: 4px solid var(--hold); }
+.tile:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.22); transition: all .15s ease; }
+
+.tile-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.tile-sim {
+  font-family: var(--mono); font-size: .88rem; font-weight: 700; direction: ltr;
+  word-break: break-all; text-align: start; line-height: 1.35; flex: 1; min-width: 0;
+}
+.tile-badge {
+  font-size: .66rem; padding: 2px 8px; border-radius: 999px; font-weight: 700;
+  flex-shrink: 0; letter-spacing: .2px;
+}
+.tile-badge.clean { background: var(--on-bg); color: var(--on); }
+.tile-badge.used  { background: var(--hold-bg); color: var(--hold); }
+
+.tile-company {
+  display: flex; align-items: center; gap: 7px;
+  font-size: .84rem; color: var(--fg);
+}
+.tile-company .tc-icon { font-size: 1rem; opacity: .8; }
+.tile-company .tc-name { font-weight: 600; }
+
+.tile-notes {
+  font-size: .76rem; color: var(--muted);
+  background: color-mix(in srgb, var(--line) 25%, transparent);
+  border-radius: 8px; padding: 5px 9px; line-height: 1.4;
 }
 
-.overlay { position: fixed; inset: 0; z-index: 20; background: rgba(8,18,26,.55); display: flex; align-items: center; justify-content: center; padding: 14px; }
+.tile-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 2px; }
+.tile-btn {
+  border: 1px solid var(--line); background: var(--surface);
+  border-radius: 8px; padding: 7px 5px; font-size: .74rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 3px;
+  color: var(--fg); transition: all .15s ease;
+}
+.tile-btn:hover { border-color: var(--accent); }
+.tile-btn.use { border-color: var(--on); color: var(--on); background: color-mix(in srgb, var(--on-bg) 30%, transparent); }
+.tile-btn.use:hover { background: var(--on); color: #08210f; }
+.tile-btn.restore { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 40%, transparent); }
+.tile-btn.restore:hover { background: var(--accent); color: var(--accent-fg); }
+.tile-btn.del { border-color: var(--danger); color: var(--danger); }
+.tile-btn.del:hover { background: var(--danger); color: #fff; }
+.tile-btn.copy { border-color: var(--line); color: var(--muted); }
+.tile-btn.copy:hover { color: var(--accent); border-color: var(--accent); }
+
+.empty { padding: 60px 20px; text-align: center; color: var(--muted); background: var(--surface); border-radius: 14px; border: 1px dashed var(--line); grid-column: 1 / -1; }
+.empty .big { font-size: 2.4rem; display: block; margin-bottom: 10px; }
+.empty .empty-title { font-weight: 700; color: var(--fg); font-size: 1rem; margin-bottom: 4px; }
+.empty .empty-sub { font-size: .82rem; }
+
+/* ===== DRAWER ===== */
+.drawer-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .25s ease; backdrop-filter: blur(3px); }
+.drawer-scrim.open { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; bottom: 0; right: 0; width: min(400px, 94vw); background: var(--surface); border-left: 1px solid var(--line); z-index: 61; transform: translateX(100%); transition: transform .3s cubic-bezier(.2,.8,.2,1); display: flex; flex-direction: column; box-shadow: var(--shadow); }
+.drawer.open { transform: translateX(0); }
+.drawer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 16px 16px 12px; border-bottom: 1px solid var(--line); }
+.drawer-title { font-size: 1.05rem; font-weight: 700; }
+.drawer-sub { font-size: .74rem; color: var(--muted); margin-top: 1px; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 14px; display: grid; gap: 16px; align-content: start; }
+.drawer-body::-webkit-scrollbar { width: 6px; }
+.drawer-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
+
+.side-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.side-nav-btn {
+  border: 1px solid var(--line); background: var(--surface-card); color: var(--muted);
+  font-size: .88rem; font-weight: 700; padding: 14px 10px; border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  transition: all .15s ease;
+}
+.side-nav-btn:hover { transform: translateY(-2px); }
+.side-nav-btn .sn-icon { font-size: 1.6rem; }
+.side-nav-btn .sn-num { font-family: var(--mono); font-size: 1.15rem; font-weight: 800; line-height: 1; }
+.side-nav-btn .sn-label { font-size: .74rem; }
+.side-nav-btn.clean.active { background: var(--on); color: #08210f; border-color: var(--on); }
+.side-nav-btn.clean { border-color: color-mix(in srgb, var(--on) 40%, var(--line)); }
+.side-nav-btn.clean .sn-num { color: var(--on); }
+.side-nav-btn.clean.active .sn-num { color: #08210f; }
+.side-nav-btn.used.active { background: var(--hold); color: #2a1f00; border-color: var(--hold); }
+.side-nav-btn.used { border-color: color-mix(in srgb, var(--hold) 40%, var(--line)); }
+.side-nav-btn.used .sn-num { color: var(--hold); }
+.side-nav-btn.used.active .sn-num { color: #2a1f00; }
+
+.side-panel { display: none; gap: 14px; align-content: start; }
+.side-panel.active { display: grid; }
+
+.drawer-section { display: grid; gap: 8px; }
+.drawer-section-head { display: flex; justify-content: space-between; align-items: center; font-size: .84rem; font-weight: 700; color: var(--fg); }
+.drawer-section-head b { font-family: var(--mono); font-size: .74rem; color: var(--muted); background: var(--bg); border: 1px solid var(--line); padding: 2px 10px; border-radius: 999px; }
+.mini-list { display: grid; gap: 6px; max-height: 340px; overflow-y: auto; padding-inline-end: 2px; }
+.mini-list::-webkit-scrollbar { width: 4px; }
+.mini-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+.mini-item {
+  width: 100%; text-align: start; background: var(--surface-card); border: 1px solid var(--line);
+  border-radius: 10px; padding: 9px 11px; display: grid; gap: 2px; transition: all .15s ease;
+}
+.mini-item:hover { border-color: var(--accent); transform: translateX(-2px); }
+.mini-item.clean { border-inline-start: 3px solid var(--on); }
+.mini-item.used  { border-inline-start: 3px solid var(--hold); }
+.mini-item .mi-sim { font-family: var(--mono); font-size: .82rem; font-weight: 700; direction: ltr; }
+.mini-item .mi-meta { font-size: .72rem; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+.mini-empty { font-size: .82rem; color: var(--muted); text-align: center; padding: 22px 14px; border: 1px dashed var(--line); border-radius: 10px; }
+
+.drawer-actions { display: grid; gap: 8px; }
+.drawer-actions .btn { text-align: center; }
+
+/* ===== MODAL ===== */
+.overlay { position: fixed; inset: 0; z-index: 70; background: rgba(8,18,26,.75); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; padding: 14px; }
 .overlay[hidden] { display: none; }
-.dlg { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); width: 100%; max-width: 440px; max-height: 100%; overflow-y: auto; padding: 18px; display: grid; gap: 12px; }
-.dlg h2 { margin: 0; font-size: 1.1rem; }
-.field { display: grid; gap: 4px; }
-.field label { font-size: .82rem; color: var(--muted); font-weight: 500; }
-.field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 9px 12px; }
-.field textarea { min-height: 70px; resize: vertical; }
+.dlg { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); width: 100%; max-width: 500px; max-height: 92vh; overflow-y: auto; padding: 18px; display: grid; gap: 13px; border: 1px solid var(--line); animation: dlgIn .22s ease both; }
+@keyframes dlgIn { from { opacity: 0; transform: scale(.97) translateY(6px); } to { opacity: 1; transform: none; } }
+.dlg h2 { margin: 0; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.field { display: grid; gap: 5px; }
+.field label { font-size: .8rem; color: var(--muted); font-weight: 500; }
+.field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px 13px; color: var(--fg); font-size: .93rem; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
 .field input.ltr { direction: ltr; text-align: right; font-family: var(--mono); }
+.field textarea { min-height: 70px; resize: vertical; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.two[hidden] { display: none; }
-.alarmbox { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 10px; background: var(--bg); }
-.chk { display: flex; gap: 8px; align-items: center; font-weight: 500; }
-.chk input { width: 18px; height: 18px; accent-color: var(--accent); }
-.err { color: var(--danger); font-size: .85rem; min-height: 1.2em; }
-.actions { display: flex; gap: 8px; align-items: center; }
+@media (max-width: 480px) { .two { grid-template-columns: 1fr; } }
+.actions { display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
 .actions .spacer { flex: 1; }
-.hint { color: var(--muted); font-size: .8rem; margin: 0; }
-.toast { position: fixed; inset-inline: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); margin-inline: auto; width: fit-content; max-width: 100%; background: var(--fg); color: var(--bg); padding: 10px 18px; border-radius: 8px; z-index: 30; font-size: .9rem; }
+.hint { color: var(--muted); font-size: .78rem; margin: 0; line-height: 1.5; }
+
+.range-box { display: grid; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; }
+.range-box label { font-size: .8rem; font-weight: 600; color: var(--fg); }
+.range-box textarea { min-height: 130px; font-family: var(--mono); font-size: .82rem; direction: ltr; text-align: left; }
+
+/* Toast */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 11px 16px; border-radius: 11px; z-index: 90; font-size: .88rem; box-shadow: 0 6px 20px rgba(0,0,0,.35); display: flex; align-items: center; gap: 12px; max-width: min(92vw, 480px); animation: toastIn .25s ease both; }
+.toast.out { animation: toastOut .3s ease both; }
+.toast .toast-action { background: transparent; border: 1px solid currentColor; color: inherit; border-radius: 8px; padding: 3px 10px; font-size: .8rem; font-weight: 700; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 18px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes toastOut { to { opacity: 0; transform: translate(-50%, 18px); } }
 </style>
 </head>
 <body>
+
 <div class="wrap">
   <header class="top">
     <div class="titlebar">
-      <div>
-        <h1>سجل الشرائح</h1>
-        <div class="sub" id="summary"></div>
+      <div class="title-left">
+        <button class="icon-btn" id="menuBtn" type="button" aria-label="القائمة الجانبية">☰</button>
+        <div>
+          <h1>إدارة الشرائح</h1>
+          <div class="sub" id="summary">جاري التحميل…</div>
+        </div>
       </div>
       <div class="btns">
-        <button class="btn" id="setBtn" type="button" aria-label="الإعدادات">الإعدادات</button>
-        <button class="btn primary" id="addBtn" type="button">+ إضافة</button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر">🌙</button>
+        <button class="btn purple" id="addManyBtn" type="button">إضافة مجموعة</button>
+        <button class="icon-btn accent" id="addBtn" type="button" aria-label="إضافة">＋</button>
       </div>
     </div>
-    <div class="alerts" id="alerts"></div>
-    <div class="search"><input id="q" type="search" inputmode="search" autocomplete="off" placeholder="ابحث برقم الهاتف أو رقم الشريحة أو جزء منهما، أو باسم الزبون" aria-label="بحث"></div>
-    <div class="tabs" id="tabs" role="group" aria-label="تصفية حسب الحالة"></div>
+
+    <div class="main-tabs" id="mainTabs">
+      <button type="button" class="main-tab clean-tab" data-tab="clean">
+        <span class="mt-icon">🟢</span>
+        <span>شرائح نظيفة</span>
+        <b id="tabCleanCount">0</b>
+      </button>
+      <button type="button" class="main-tab used-tab" data-tab="used">
+        <span class="mt-icon">🟡</span>
+        <span>شرائح مستعملة</span>
+        <b id="tabUsedCount">0</b>
+      </button>
+    </div>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="ابحث برقم الشريحة أو اسم الشركة…" autocomplete="off">
+      <span class="search-icon">🔍</span>
+      <button class="clear-btn" id="clearQ" type="button" aria-label="مسح">✕</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card clean">
+        <div class="sc-num" id="statClean">0</div>
+        <div class="sc-lbl">🟢 نظيفة متاحة</div>
+      </div>
+      <div class="stat-card used">
+        <div class="sc-num" id="statUsed">0</div>
+        <div class="sc-lbl">🟡 مستعملة</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-num" id="statTotal">0</div>
+        <div class="sc-lbl">📦 الإجمالي</div>
+      </div>
+    </div>
   </header>
-  <main><div class="list" id="list" aria-live="polite"></div></main>
+
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
 </div>
 
+<!-- ============ DRAWER ============ -->
+<div class="drawer-scrim" id="drawerScrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title">لوحة التحكم</div>
+      <div class="drawer-sub">إدارة الشرائح النظيفة والمستعملة</div>
+    </div>
+    <button class="icon-btn" id="drawerClose" type="button" aria-label="إغلاق">✕</button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="side-nav">
+      <button type="button" class="side-nav-btn clean active" data-panel="clean">
+        <span class="sn-icon">🟢</span>
+        <span class="sn-num" id="snCleanNum">0</span>
+        <span class="sn-label">شرائح نظيفة</span>
+      </button>
+      <button type="button" class="side-nav-btn used" data-panel="used">
+        <span class="sn-icon">🟡</span>
+        <span class="sn-num" id="snUsedNum">0</span>
+        <span class="sn-label">شرائح مستعملة</span>
+      </button>
+    </div>
+
+    <div class="side-panel active" id="panel-clean">
+      <div class="drawer-section">
+        <div class="drawer-section-head">
+          <span>🟢 قائمة الشرائح النظيفة</span>
+          <b id="snCleanListCount">0</b>
+        </div>
+        <div class="mini-list" id="snCleanList"></div>
+      </div>
+    </div>
+
+    <div class="side-panel" id="panel-used">
+      <div class="drawer-section">
+        <div class="drawer-section-head">
+          <span>🟡 قائمة الشرائح المستعملة</span>
+          <b id="snUsedListCount">0</b>
+        </div>
+        <div class="mini-list" id="snUsedList"></div>
+      </div>
+    </div>
+
+    <div class="drawer-actions" style="margin-top:4px; padding-top:12px; border-top:1px solid var(--line);">
+      <button class="btn purple" id="dAddClean" type="button">＋ إضافة شريحة نظيفة</button>
+      <button class="btn" id="dAddMany" type="button">📋 استيراد مجموعة شرائح</button>
+      <button class="btn" id="dExpCSV" type="button">⬇️ تصدير Excel / CSV</button>
+      <button class="btn danger" id="dWipe" type="button">🗑️ حذف جميع الشرائح</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ============ ADD/EDIT SINGLE MODAL ============ -->
 <div class="overlay" id="overlay" hidden>
   <form class="dlg" id="form" novalidate>
-    <h2 id="dlgTitle">إضافة شريحة</h2>
-    <div class="field"><label for="f-name">اسم الزبون</label><input id="f-name" type="text" autocomplete="off"></div>
+    <h2>
+      <span id="dlgTitle">إضافة شريحة</span>
+      <button class="btn sm" type="button" id="closeDlg">إغلاق</button>
+    </h2>
+
+    <div class="field">
+      <label for="f-sim">رقم الشريحة (SIM) *</label>
+      <input id="f-sim" class="ltr" type="text" inputmode="numeric" autocomplete="off" placeholder="8997…">
+    </div>
+
     <div class="two">
-      <div class="field"><label for="f-phone">رقم الهاتف</label><input id="f-phone" class="ltr" type="text" inputmode="numeric" autocomplete="off" placeholder="05XXXXXXXX"></div>
-      <div class="field"><label for="f-company">الشركة</label>
-        <select id="f-company"><option value="">غير محددة</option><option>سلكوم</option><option>هوت</option><option>بلفون</option><option>بارتنر</option><option>رامي ليفي</option><option>019</option><option>وي</option></select>
+      <div class="field">
+        <label for="f-company">شركة الاتصالات</label>
+        <select id="f-company">
+          <option value="">اختر الشركة</option>
+          <option>سلكوم</option>
+          <option>هوت موبايل</option>
+          <option>بلفون</option>
+          <option>بارتنر</option>
+          <option>رامي ليفي</option>
+          <option>019</option>
+          <option>ألوها</option>
+          <option>وي</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-type">نوع الشريحة</label>
+        <select id="f-type">
+          <option value="clean">🟢 نظيفة</option>
+          <option value="used">🟡 مستعملة</option>
+        </select>
       </div>
     </div>
-    <div class="field"><label for="f-sim">رقم الشريحة</label><input id="f-sim" class="ltr" type="text" inputmode="numeric" autocomplete="off" placeholder="8997…"></div>
-    <div class="field"><label for="f-place">مكان التفعيل</label><input id="f-place" type="text" autocomplete="off" placeholder="مثال: المحل، البيت، اسم الشخص أو المنطقة"></div>
-    <div class="field"><label for="f-wa">رقم التواصل واتساب</label><input id="f-wa" class="ltr" type="text" inputmode="tel" autocomplete="off" placeholder="05XXXXXXXX أو 972XXXXXXXXX"></div>
-    <div class="two">
-      <div class="field"><label for="f-status">الحالة</label>
-        <select id="f-status"><option value="active">مفعل</option><option value="suspended">معلق</option><option value="disconnected">مفصول</option></select>
-      </div>
-      <div class="field"><label for="f-date">تاريخ الفصل / القطع</label><input id="f-date" type="date"></div>
+
+    <div class="field">
+      <label for="f-notes">ملاحظات</label>
+      <textarea id="f-notes" placeholder="ملاحظات إضافية…"></textarea>
     </div>
-    <div class="alarmbox">
-      <label class="chk" for="f-alarm-on"><input id="f-alarm-on" type="checkbox"> تفعيل المنبه</label>
-      <div class="two" id="alarmRow" hidden>
-        <div class="field"><label for="f-alarm-date">تاريخ المنبه</label><input id="f-alarm-date" type="date"></div>
-        <div class="field"><label for="f-alarm-time">الساعة</label><input id="f-alarm-time" type="time" value="09:00"></div>
-      </div>
-    </div>
-    <div class="field"><label for="f-notes">ملاحظات</label><textarea id="f-notes" placeholder="أي ملاحظة عن الشريحة أو الزبون"></textarea></div>
-    <div class="err" id="err" role="alert"></div>
+
+    <div style="color:var(--danger);font-size:.83rem;min-height:1.1em;" id="err"></div>
+
     <div class="actions">
-      <button class="btn primary" type="submit" id="saveBtn">حفظ</button>
-      <button class="btn" type="button" id="cancelBtn">إلغاء</button>
-      <span class="spacer"></span>
+      <button class="btn primary" type="submit" style="flex:2;">حفظ</button>
       <button class="btn danger" type="button" id="delBtn" hidden>حذف</button>
     </div>
   </form>
 </div>
 
-<div class="overlay" id="setOverlay" hidden>
-  <div class="dlg">
-    <h2>الإعدادات</h2>
-    <div class="field">
-      <label for="s-hour">ساعة إشعارات الفصل (قبل الفصل بيوم ويوم الفصل)</label>
-      <select id="s-hour"></select>
-    </div>
-    <p class="hint">الإشعارات تصل من الهاتف نفسه حتى لو كان التطبيق مغلقًا ولا تحتاج إنترنت.</p>
-    <div class="field">
-      <label>مشاركة البيانات مع جهاز آخر</label>
-      <div class="btns">
-        <button class="btn" type="button" id="expBtn">تصدير نسخة</button>
-        <button class="btn" type="button" id="impBtn">استيراد ودمج</button>
+<!-- ============ BULK ADD MODAL ============ -->
+<div class="overlay" id="bulkOverlay" hidden>
+  <form class="dlg" id="bulkForm" novalidate>
+    <h2>
+      <span>📋 استيراد مجموعة شرائح</span>
+      <button class="btn sm" type="button" id="bulkClose">إغلاق</button>
+    </h2>
+
+    <p class="hint">الصق أرقام الشرائح (كل رقم في سطر)، واختر الشركة والنوع ليتم تطبيقها على الكل.</p>
+
+    <div class="two">
+      <div class="field">
+        <label for="b-company">شركة الاتصالات</label>
+        <select id="b-company">
+          <option value="">بدون شركة</option>
+          <option>سلكوم</option>
+          <option>هوت موبايل</option>
+          <option>بلفون</option>
+          <option>بارتنر</option>
+          <option>رامي ليفي</option>
+          <option>019</option>
+          <option>ألوها</option>
+          <option>وي</option>
+          <option>أخرى</option>
+        </select>
       </div>
-      <input id="impFile" type="file" accept=".json,application/json" hidden>
-      <p class="hint">صدّر النسخة وأرسلها لجهاز آخر (واتساب أو غيره) ثم استوردها هناك. يؤخذ الأحدث تعديلًا لكل سجل.</p>
+      <div class="field">
+        <label for="b-type">نوع الشريحة</label>
+        <select id="b-type">
+          <option value="clean">🟢 نظيفة</option>
+          <option value="used">🟡 مستعملة</option>
+        </select>
+      </div>
     </div>
-    <div class="field">
-      <label>الإشعارات والمنبه</label>
-      <button class="btn" type="button" id="testBtn">تفعيل الإشعارات واختبارها</button>
-      <p class="hint">اضغط الزر ثم اخرج من التطبيق. يجب أن يصلك إشعار خلال 10 ثوانٍ. إن لم يصل، اسمح للتطبيق بالإشعارات والمنبهات، وأوقف توفير البطارية له من إعدادات الهاتف.</p>
+
+    <div class="range-box">
+      <label for="b-list">قائمة أرقام الشرائح</label>
+      <textarea id="b-list" placeholder="899720204998524385&#10;899720204993710443&#10;899720206476741266…"></textarea>
     </div>
-    <div class="err" id="setMsg" role="status"></div>
-    <div class="actions"><button class="btn primary" type="button" id="setClose">إغلاق</button></div>
-  </div>
+
+    <div style="color:var(--danger);font-size:.83rem;min-height:1.1em;" id="bulkErr"></div>
+
+    <div class="actions">
+      <span class="hint" id="bulkCount" style="margin:0;">0 رقم</span>
+      <span class="spacer"></span>
+      <button class="btn primary" type="submit">حفظ الكل</button>
+    </div>
+  </form>
 </div>
 
-<script src="seed.js"></script>
 <script>
 (function () {
-  var STATUS = { active: "مفعل", suspended: "معلق", disconnected: "مفصول" };
-  var ORDER = ["active", "suspended", "disconnected"];
-  var PAGE = 80, KEY = "sims_v1", TOMB = "sims_deleted_v1", SET = "sims_settings_v1";
-  var Cap = window.Capacitor, P = (Cap && Cap.Plugins) || {};
-  var LN = P.LocalNotifications, FS = P.Filesystem, SH = P.Share;
+  "use strict";
 
-  var docs = new Map(), tomb = {}, settings = { hour: 9 };
-  var filter = "all", query = "", shown = PAGE, editingId = null, delArmed = false;
-  var $ = function (id) { return document.getElementById(id); };
-  var listEl = $("list"), tabsEl = $("tabs"), summaryEl = $("summary");
+  var STORAGE_KEY = "sim_inventory_v2";
+  var THEME_KEY = "sim_theme_v2";
+  var SEED_FLAG = "sim_inv_seeded_v2";
 
-  // ---------- helpers
-  function toLatin(s) { return String(s || "").replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 0x660; }).replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 0x6f0; }); }
-  function digits(s) { return toLatin(s).replace(/\D/g, ""); }
-  function pad(n) { return String(n).padStart(2, "0"); }
-  function fmtDate(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); return m ? m[3] + "/" + m[2] + "/" + m[1] : "—"; }
-  function daysFrom(iso) {
-    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); if (!m) return null;
-    var t = new Date(), a = Date.UTC(t.getFullYear(), t.getMonth(), t.getDate());
-    return Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - a) / 86400000);
-  }
-  function dayNote(r) {
-    var d = daysFrom(r.cutDate); if (d === null) return "";
-    if (r.status === "active") return d > 0 ? "باقي " + d + " يوم" : d === 0 ? "ينتهي اليوم" : "انتهى منذ " + (-d) + " يوم";
-    return "منذ " + Math.abs(d) + " يوم";
-  }
-  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function toast(msg) { var t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(function () { t.remove(); }, 2600); }
-  function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h % 2000000000) + 1; }
-  function newId() { return "n" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  /* ============================================================
+     SEED DATA — الشرائح النظيفة المطلوبة
+     ============================================================ */
+  var SEED_CLEAN_SIMS = [
+    "899720204998524385","899720204993710443","899720206476741266","899720204753147869",
+    "899720206477046764","899720201492746456","899720206995302798","899720204998524138",
+    "899720201509002992","899720201509281067","899720206479187087","899720208496505648",
+    "899720208496505952","899720208475003680","899720201997074487","899720204994443069",
+    "899720201530003175","899720201508033923","899720201508043393","899720201508043096",
+    "899720201507798070","899720201507798120","899720201507798138","899720208497370810",
+    "899720203500827336","899720201602269761","899720201530004967","899720203507516874",
+    "899720203507503807","899720203507509085","899720204496546567","899720204496573264",
+    "899720204495307268","899720204500814555","899720204496539612","899720204496573298",
+    "899720204496538952","899720203507497984","899720203500826551","899720204496798366",
+    "899720203507510794","899720204500814282","899720204496546385","899720203507509010",
+    "899720204496548548","899720204496527195","899720203500827021","899720203507515470",
+    "899720204500814050","899720204496574304","899720203507515371","899720203507496986",
+    "899720203507496556","899720204496545700","899720204496814254","899720203507515926",
+    "899720204496546203","899720204496810930","899720203507514937","899720204496799273",
+    "899720203507513384","899720203507497414","899720204496782634","899720204500814647",
+    "899720203500827617","899720203507497117","899720204496814106","899720204496808371",
+    "899720204496805492","899720204496546252","899720204496548555","899720204496573884",
+    "899720203507497562","899720204496814528","899720204496574817","899720203507509119",
+    "899720204496538366","899720203507508178","899720204496527344","899720204496799943",
+    "899720203507508608","899720204496821457","899720204496782097","899720204496780703",
+    "899720203507509192","899720204998511358","899720201505741999","899720201505742005",
+    "899720201505742013","899720208492673978","899720201505742047","899720201508043377",
+    "899720201501441784","899720201502049339","899720204994448514","899720201491832034",
+    "899720204993578550","899720208476793990"
+  ];
 
-  // ---------- storage (works with no internet)
-  function readJSON(k, fb) { try { var s = localStorage.getItem(k); return s ? JSON.parse(s) : fb; } catch (e) { return fb; } }
-  function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
-  function loadAll() {
-    var arr = readJSON(KEY, null), sv = window.SEED_VERSION || "0", seen = null;
-    try { seen = localStorage.getItem("sims_seed_ver"); } catch (e) {}
-    if (!arr || seen !== sv) {
-      // new built-in data set: replace everything stored on this device
-      arr = (window.SEED || []).slice(); writeJSON(KEY, arr); writeJSON(TOMB, {});
-      try { localStorage.setItem("sims_seed_ver", sv); } catch (e) {}
+  /* ============================================================
+     STATE
+     ============================================================ */
+  var sims = new Map();          // _id -> { _id, sim, company, type, notes, createdAt, updatedAt }
+  var activeTab = "clean";       // "clean" | "used"
+  var query = "";
+  var editingId = null;
+  var delArmed = false;
+  var lastDeleted = null;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  }); }
+  function uid() { return "sim_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7); }
+  function digitsOnly(s) { return String(s || "").replace(/\D/g, ""); }
+
+  function toast(msg, actionLabel, actionFn) {
+    var t = document.createElement("div");
+    t.className = "toast";
+    var span = document.createElement("span"); span.textContent = msg;
+    t.appendChild(span);
+    if (actionLabel && actionFn) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "toast-action"; b.textContent = actionLabel;
+      b.addEventListener("click", function () { actionFn(); dismiss(); });
+      t.appendChild(b);
     }
-    arr.forEach(function (r) { docs.set(r._id, r); });
-    tomb = readJSON(TOMB, {});
-    var s = readJSON(SET, null); if (s && typeof s.hour === "number") settings = s;
-  }
-  function persist() {
-    var ok = writeJSON(KEY, Array.from(docs.values())) && writeJSON(TOMB, tomb);
-    if (!ok) toast("تعذر الحفظ على الجهاز. المساحة ممتلئة.");
-    scheduleNotifs();
+    document.body.appendChild(t);
+    var timer = setTimeout(dismiss, actionLabel ? 5000 : 2500);
+    function dismiss() { clearTimeout(timer); if (!t.parentNode) return; t.classList.add("out"); setTimeout(function () { t.remove(); }, 300); }
   }
 
-  // ---------- sorting / search
-  function sorted(arr) {
-    return arr.sort(function (a, b) {
-      var sa = ORDER.indexOf(a.status), sb = ORDER.indexOf(b.status);
-      if (sa !== sb) return sa - sb;
-      var da = a.cutDate || "", db = b.cutDate || "";
-      if (a.status === "disconnected") return da < db ? 1 : da > db ? -1 : 0;
-      return da < db ? -1 : da > db ? 1 : 0;
-    });
+  function copyText(text) {
+    text = String(text || "");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast("تم النسخ ✓"); })
+        .catch(function () { fallbackCopy(text); });
+    } else fallbackCopy(text);
   }
-  function dueDays(r) {
-    if (r.status === "disconnected") return null;
-    var d = daysFrom(r.cutDate); return d === 0 || d === 1 ? d : null;
-  }
-  function alarmDue(r) {
-    if (!r.alarmOn || r.alarmDone || !r.alarmAt) return false;
-    var t = new Date(r.alarmAt).getTime(); return !isNaN(t) && Date.now() >= t;
-  }
-  function matches(r) {
-    if (filter === "due") { if (dueDays(r) === null) return false; }
-    else if (filter !== "all" && r.status !== filter) return false;
-    var raw = query.trim(); if (!raw) return true;
-    var d = digits(raw), plain = /^[\d\s\-+()٠-٩۰-۹]+$/.test(raw);
-    if (plain && d) {
-      if ((r.phone || "").indexOf(d) !== -1 || (r.sim || "").indexOf(d) !== -1) return true;
-      if (d[0] === "0" && (r.phone || "").indexOf(d.slice(1)) !== -1) return true;
-      return false;
-    }
-    var hay = [r.name, r.phone, r.sim, r.company, r.place, r.notes].join(" ").toLowerCase();
-    return hay.indexOf(raw.toLowerCase()) !== -1;
-  }
-  function waLink(r) {
-    var n = digits(r.wa); if (!n) return "";
-    if (n.charAt(0) === "0") n = "972" + n.slice(1);
-    return '<a class="wa" href="https://wa.me/' + n + '" target="_blank" rel="noopener">واتساب</a>';
-  }
-
-  // ---------- render
-  function renderAlerts(all) {
-    var today = all.filter(function (r) { return dueDays(r) === 0; }).length;
-    var tmr = all.filter(function (r) { return dueDays(r) === 1; }).length, h = "";
-    all.filter(alarmDue).forEach(function (r) {
-      var p = r.alarmAt.split("T");
-      h += '<div class="alert alarm"><span>⏰ منبه: ' + esc(r.name || r.phone) + " · " + esc(r.phone) + " · " + fmtDate(p[0]) + " " + esc(p[1] || "") + '</span><button type="button" data-ack="' + esc(r._id) + '">تم</button></div>';
-    });
-    if (today) h += '<div class="alert today"><span>تنبيه: ' + today + ' شريحة موعد فصلها اليوم</span><button type="button" data-due="1">عرض</button></div>';
-    if (tmr) h += '<div class="alert tomorrow"><span>تنبيه: ' + tmr + ' شريحة موعد فصلها غدًا</span><button type="button" data-due="1">عرض</button></div>';
-    $("alerts").innerHTML = h;
-  }
-  function renderTabs(all) {
-    var c = { all: all.length, active: 0, suspended: 0, disconnected: 0, due: 0 };
-    all.forEach(function (r) { c[r.status] = (c[r.status] || 0) + 1; if (dueDays(r) !== null) c.due++; });
-    var defs = [["all", "الكل"], ["active", "مفعل"], ["suspended", "معلق"], ["disconnected", "مفصول"]];
-    if (c.due) defs.push(["due", "تنبيهات"]);
-    if (filter === "due" && !c.due) filter = "all";
-    tabsEl.innerHTML = defs.map(function (t) { return '<button type="button" class="tab" data-f="' + t[0] + '" aria-pressed="' + (filter === t[0]) + '">' + t[1] + " <b>" + (c[t[0]] || 0) + "</b></button>"; }).join("");
-    summaryEl.textContent = all.length ? "إجمالي " + all.length + " شريحة · مرتبة: مفعل ثم معلق ثم مفصول" : "لا توجد شرائح بعد";
-  }
-  function render() {
-    var all = Array.from(docs.values());
-    renderTabs(all); renderAlerts(all);
-    var rows = sorted(all.filter(matches));
-    if (!rows.length) { listEl.innerHTML = '<div class="empty">' + (all.length ? "لا توجد نتائج مطابقة للبحث." : "لا توجد شرائح. اضغط «إضافة» لإدخال أول سجل.") + "</div>"; return; }
-    var out = ['<div class="row head"><span>#</span><span>رقم الهاتف</span><span>رقم الشريحة</span><span>اسم الزبون</span><span>تاريخ الفصل</span><span>الحالة</span><span></span></div>'];
-    var last = null, i = 0, counts = {};
-    rows.forEach(function (r) { counts[r.status] = (counts[r.status] || 0) + 1; });
-    rows.slice(0, shown).forEach(function (r) {
-      if (filter === "all" && r.status !== last) { last = r.status; out.push('<div class="row group"><span class="pill ' + r.status + '">' + STATUS[r.status] + '</span><span class="n">' + counts[r.status] + "</span></div>"); }
-      i++;
-      var sub = [r.company, r.place ? "📍 " + r.place : "", r.alarmOn && r.alarmAt ? "⏰ " + fmtDate(r.alarmAt.split("T")[0]) + " " + (r.alarmAt.split("T")[1] || "") : ""].filter(Boolean).map(esc).join(" · ");
-      out.push('<div class="row' + (dueDays(r) !== null ? " due" : "") + '">' +
-        '<span class="idx num">' + i + "</span>" +
-        '<span class="c-phone num">' + esc(r.phone) + "</span>" +
-        '<span class="c-sim num sim">' + esc(r.sim || "—") + "</span>" +
-        '<span class="c-name name">' + esc(r.name || "—") + (sub ? "<small>" + sub + "</small>" : "") + (r.notes ? '<span class="note">' + esc(r.notes) + "</span>" : "") + "</span>" +
-        '<span class="c-date date">' + fmtDate(r.cutDate) + "<small>" + dayNote(r) + "</small></span>" +
-        '<span class="c-status"><span class="pill ' + r.status + '">' + STATUS[r.status] + "</span></span>" +
-        '<span class="c-edit">' + waLink(r) + '<button type="button" class="edit" data-id="' + esc(r._id) + '">تعديل</button></span></div>');
-    });
-    if (rows.length > shown) out.push('<div class="more"><button class="btn" type="button" id="moreBtn">عرض المزيد (' + (rows.length - shown) + ")</button></div>");
-    listEl.innerHTML = out.join("");
-  }
-
-  // ---------- local notifications (phone fires them, no internet needed)
-  async function ensureChannel() {
-    try { await LN.createChannel({ id: "alarms", name: "تنبيهات الفصل والمنبه", description: "إشعارات موعد الفصل والمنبه", importance: 5, visibility: 1, vibration: true }); } catch (e) {}
-  }
-  var schedTimer;
-  function scheduleNotifs() { clearTimeout(schedTimer); schedTimer = setTimeout(doSchedule, 400); }
-  async function doSchedule() {
-    if (!LN) return;
+  function fallbackCopy(text) {
     try {
-      var perm = await LN.checkPermissions();
-      if (perm.display !== "granted") perm = await LN.requestPermissions();
-      if (perm.display !== "granted") return;
-      await ensureChannel();
-      var pend = await LN.getPending();
-      if (pend.notifications && pend.notifications.length) await LN.cancel({ notifications: pend.notifications });
-      var list = [], now = Date.now(), h = settings.hour;
-      docs.forEach(function (r) {
-        var who = (r.name || r.phone) + " · " + r.phone;
-        if (r.status !== "disconnected" && /^\d{4}-\d{2}-\d{2}$/.test(r.cutDate || "")) {
-          var p = r.cutDate.split("-").map(Number);
-          var day = new Date(p[0], p[1] - 1, p[2], h, 0, 0), before = new Date(p[0], p[1] - 1, p[2] - 1, h, 0, 0);
-          if (before.getTime() > now) list.push({ id: hash(r._id + "b"), title: "فصل شريحة غدًا", body: who, schedule: { at: before, allowWhileIdle: true } });
-          if (day.getTime() > now) list.push({ id: hash(r._id + "d"), title: "فصل شريحة اليوم", body: who, schedule: { at: day, allowWhileIdle: true } });
-        }
-        if (r.alarmOn && !r.alarmDone && r.alarmAt) {
-          var at = new Date(r.alarmAt);
-          if (!isNaN(at) && at.getTime() > now) list.push({ id: hash(r._id + "a"), title: "منبه", body: who + (r.notes ? " — " + r.notes : ""), schedule: { at: at, allowWhileIdle: true } });
-        }
-      });
-      list.forEach(function (n) { n.channelId = "alarms"; });
-      list.sort(function (a, b) { return a.schedule.at - b.schedule.at; });
-      if (list.length) await LN.schedule({ notifications: list.slice(0, 450) });
-    } catch (e) {}
+      var ta = document.createElement("textarea"); ta.value = text;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+      toast("تم النسخ ✓");
+    } catch (e) { toast("تعذر النسخ"); }
   }
 
-  // ---------- add / edit dialog
-  function openDlg(id) {
-    editingId = id; delArmed = false;
-    var r = id ? docs.get(id) : null;
-    $("dlgTitle").textContent = r ? "تعديل الشريحة" : "إضافة شريحة";
-    $("f-name").value = r ? r.name || "" : ""; $("f-phone").value = r ? r.phone || "" : "";
-    $("f-sim").value = r ? r.sim || "" : ""; $("f-company").value = r ? r.company || "" : "";
-    $("f-place").value = r ? r.place || "" : ""; $("f-wa").value = r ? r.wa || "" : "";
-    $("f-status").value = r ? r.status : "active"; $("f-date").value = r ? r.cutDate || "" : "";
-    $("f-notes").value = r ? r.notes || "" : "";
-    var at = r && r.alarmAt ? r.alarmAt.split("T") : ["", "09:00"];
-    $("f-alarm-on").checked = !!(r && r.alarmOn); $("f-alarm-date").value = at[0] || ""; $("f-alarm-time").value = at[1] || "09:00";
-    $("alarmRow").hidden = !$("f-alarm-on").checked;
-    $("err").textContent = "";
-    var del = $("delBtn"); del.hidden = !r; del.textContent = "حذف"; del.classList.remove("armed");
-    $("overlay").hidden = false; $("f-name").focus();
-  }
-  function closeDlg() { $("overlay").hidden = true; editingId = null; }
-
-  $("f-alarm-on").addEventListener("change", function () {
-    var on = $("f-alarm-on").checked; $("alarmRow").hidden = !on;
-    if (on && !$("f-alarm-date").value) {
-      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec($("f-date").value || ""), d = m ? new Date(+m[1], +m[2] - 1, +m[3] - 1) : new Date();
-      $("f-alarm-date").value = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-    }
-  });
-  $("form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var phone = digits($("f-phone").value);
-    if (phone.length < 9) { $("err").textContent = "أدخل رقم هاتف صحيحًا."; $("f-phone").focus(); return; }
-    var dup = Array.from(docs.values()).find(function (r) { return r.phone === phone && r._id !== editingId; });
-    if (dup) { $("err").textContent = "رقم الهاتف مسجل مسبقًا باسم: " + (dup.name || "بدون اسم"); return; }
-    var alarmOn = $("f-alarm-on").checked, adate = $("f-alarm-date").value, atime = $("f-alarm-time").value || "09:00";
-    if (alarmOn && !adate) { $("err").textContent = "اختر تاريخ المنبه."; return; }
-    var id = editingId || newId();
-    var rec = Object.assign({}, docs.get(id) || {}, {
-      _id: id, phone: phone, sim: digits($("f-sim").value), name: $("f-name").value.trim(), company: $("f-company").value,
-      place: $("f-place").value.trim(), wa: digits($("f-wa").value), notes: $("f-notes").value.trim(),
-      status: $("f-status").value, cutDate: $("f-date").value,
-      alarmOn: alarmOn, alarmAt: alarmOn ? adate + "T" + atime : "", alarmDone: false, updatedAt: new Date().toISOString()
-    });
-    docs.set(id, rec); delete tomb[id]; persist(); closeDlg(); render();
-    toast(editingId ? "تم حفظ التعديل" : "تمت إضافة الشريحة");
-  });
-  $("delBtn").addEventListener("click", function () {
-    var b = $("delBtn");
-    if (!delArmed) { delArmed = true; b.textContent = "تأكيد الحذف"; b.classList.add("armed"); return; }
-    docs.delete(editingId); tomb[editingId] = new Date().toISOString(); persist(); closeDlg(); render(); toast("تم حذف السجل");
-  });
-
-  // ---------- list events
-  var t0;
-  $("q").addEventListener("input", function (e) { clearTimeout(t0); var v = e.target.value; t0 = setTimeout(function () { query = v; shown = PAGE; render(); }, 120); });
-  tabsEl.addEventListener("click", function (e) { var b = e.target.closest(".tab"); if (!b) return; filter = b.dataset.f; shown = PAGE; render(); });
-  listEl.addEventListener("click", function (e) {
-    if (e.target.id === "moreBtn") { shown += PAGE; render(); return; }
-    var b = e.target.closest(".edit"); if (b) openDlg(b.dataset.id);
-  });
-  $("alerts").addEventListener("click", function (e) {
-    if (e.target.closest("[data-due]")) { filter = "due"; shown = PAGE; render(); return; }
-    var a = e.target.closest("[data-ack]");
-    if (a) { var r = docs.get(a.dataset.ack); if (r) { r.alarmDone = true; r.updatedAt = new Date().toISOString(); persist(); render(); } }
-  });
-  $("addBtn").addEventListener("click", function () { openDlg(null); });
-  $("cancelBtn").addEventListener("click", closeDlg);
-  $("overlay").addEventListener("mousedown", function (e) { if (e.target === $("overlay")) closeDlg(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { closeDlg(); $("setOverlay").hidden = true; } });
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) render(); });
-
-  // in-app alarm sound while the app is open
-  var beeped = {};
-  function beep() {
-    try { var C = window.AudioContext || window.webkitAudioContext, ctx = new C(), o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination); o.frequency.value = 880; g.gain.value = 0.15; o.start(); o.stop(ctx.currentTime + 0.6); } catch (x) {}
-    try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (x) {}
-  }
-  setInterval(function () {
-    var fresh = false;
-    docs.forEach(function (r, id) { if (alarmDue(r) && !beeped[id]) { beeped[id] = 1; fresh = true; } });
-    if (fresh) beep();
-    render();
-  }, 30000);
-
-  // ---------- settings, export / import
-  var hs = $("s-hour");
-  for (var hh = 0; hh < 24; hh++) { var o = document.createElement("option"); o.value = hh; o.textContent = pad(hh) + ":00"; hs.appendChild(o); }
-  $("setBtn").addEventListener("click", function () { hs.value = settings.hour; $("setMsg").textContent = ""; $("setOverlay").hidden = false; });
-  $("setClose").addEventListener("click", function () { $("setOverlay").hidden = true; });
-  $("setOverlay").addEventListener("mousedown", function (e) { if (e.target === $("setOverlay")) $("setOverlay").hidden = true; });
-  hs.addEventListener("change", function () { settings.hour = +hs.value; writeJSON(SET, settings); scheduleNotifs(); $("setMsg").textContent = "تم حفظ الساعة."; });
-
-  $("expBtn").addEventListener("click", async function () {
-    var d = new Date(), name = "sims-" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "-" + pad(d.getHours()) + pad(d.getMinutes()) + ".json";
-    var data = JSON.stringify({ v: 1, exportedAt: d.toISOString(), records: Array.from(docs.values()), deleted: tomb });
-    try {
-      if (FS && SH) { var w = await FS.writeFile({ path: name, data: data, directory: "CACHE", encoding: "utf8" }); await SH.share({ title: name, url: w.uri }); }
-      else { var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "application/json" })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
-      $("setMsg").textContent = "تم تجهيز النسخة.";
-    } catch (x) { $("setMsg").textContent = "تعذر التصدير."; }
-  });
-  $("impBtn").addEventListener("click", function () { $("impFile").click(); });
-  $("impFile").addEventListener("change", function (e) {
-    var f = e.target.files && e.target.files[0]; if (!f) return;
-    var fr = new FileReader();
-    fr.onload = function () {
+  /* ============================================================
+     STORAGE
+     ============================================================ */
+  function loadData() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    if (raw) {
       try {
-        var j = JSON.parse(fr.result), added = 0, updated = 0, removed = 0;
-        (j.records || []).forEach(function (r) {
-          if (!r || !r._id) return;
-          var loc = docs.get(r._id), tl = tomb[r._id];
-          if (tl && (r.updatedAt || "") <= tl) return;
-          if (!loc) { docs.set(r._id, r); delete tomb[r._id]; added++; }
-          else if ((r.updatedAt || "") > (loc.updatedAt || "")) { docs.set(r._id, r); updated++; }
-        });
-        Object.keys(j.deleted || {}).forEach(function (id) {
-          var loc = docs.get(id), t = j.deleted[id];
-          if (loc && t > (loc.updatedAt || "")) { docs.delete(id); removed++; }
-          if (!tomb[id] || t > tomb[id]) tomb[id] = t;
-        });
-        persist(); render();
-        $("setMsg").textContent = "تم الدمج: " + added + " جديد، " + updated + " محدّث، " + removed + " محذوف.";
-      } catch (x) { $("setMsg").textContent = "الملف غير صالح."; }
-      $("impFile").value = "";
-    };
-    fr.readAsText(f);
-  });
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          arr.forEach(function (r) {
+            if (r && r._id && r.sim) {
+              if (!r.createdAt) r.createdAt = Date.now();
+              if (!r.updatedAt) r.updatedAt = r.createdAt;
+              if (r.type !== "used") r.type = "clean";
+              if (!r.company) r.company = "";
+              if (!r.notes) r.notes = "";
+              sims.set(r._id, r);
+            }
+          });
+        }
+      } catch (e) { sims = new Map(); }
+    }
+    /* Auto-seed on first run */
+    if (sims.size === 0 && localStorage.getItem(SEED_FLAG) !== "done") {
+      seedClean();
+      try { localStorage.setItem(SEED_FLAG, "done"); } catch (e) {}
+    }
+  }
 
-  $("testBtn").addEventListener("click", async function () {
-    var m = $("setMsg");
-    if (!LN) { m.textContent = "الإشعارات تعمل داخل تطبيق الأندرويد فقط."; return; }
-    try {
-      var p = await LN.requestPermissions();
-      if (p.display !== "granted") { m.textContent = "الإشعارات مرفوضة. فعّلها من إعدادات الهاتف ← التطبيقات ← سجل الشرائح ← الإشعارات."; return; }
-      await ensureChannel();
-      var ex = null; try { ex = await LN.checkExactNotificationSetting(); } catch (e) {}
-      if (ex && ex.exact_alarm && ex.exact_alarm !== "granted") {
-        m.textContent = "اسمح بـ «المنبهات والتذكيرات» في الشاشة التي ستُفتح، ثم ارجع واضغط الزر مرة أخرى.";
-        await LN.changeExactNotificationSetting(); return;
+  function seedClean() {
+    var now = Date.now();
+    var added = 0;
+    SEED_CLEAN_SIMS.forEach(function (sim) {
+      sim = String(sim).trim();
+      if (!sim) return;
+      var exists = false;
+      sims.forEach(function (r) { if (r.sim === sim) exists = true; });
+      if (exists) return;
+      sims.set(uid(), {
+        _id: uid(),
+        sim: sim,
+        company: "",
+        type: "clean",
+        notes: "مخزون أولي",
+        createdAt: now + (added++),
+        updatedAt: now + added
+      });
+    });
+    if (added > 0) saveData();
+    return added;
+  }
+
+  function saveData() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(sims.values()))); }
+    catch (e) { toast("تعذر الحفظ!"); }
+  }
+
+  /* ============================================================
+     COUNTS + STATS
+     ============================================================ */
+  function getClean() { var a = []; sims.forEach(function (r) { if (r.type === "clean") a.push(r); }); return a; }
+  function getUsed()  { var a = []; sims.forEach(function (r) { if (r.type === "used") a.push(r); }); return a; }
+
+  function updateCounts() {
+    var c = getClean().length, u = getUsed().length, t = c + u;
+    $("tabCleanCount").textContent = c;
+    $("tabUsedCount").textContent = u;
+    $("snCleanNum").textContent = c;
+    $("snUsedNum").textContent = u;
+    $("statClean").textContent = c;
+    $("statUsed").textContent = u;
+    $("statTotal").textContent = t;
+    $("summary").textContent = "🟢 نظيفة: " + c + " · 🟡 مستعملة: " + u + " · الإجمالي: " + t;
+  }
+
+  /* ============================================================
+     FILTER + RENDER
+     ============================================================ */
+  function matches(r) {
+    if (r.type !== activeTab) return false;
+    if (!query.trim()) return true;
+    var q = query.trim().toLowerCase();
+    return [r.sim, r.company, r.notes].join(" ").toLowerCase().indexOf(q) !== -1;
+  }
+
+  function sortSims(arr) {
+    return arr.slice().sort(function (a, b) {
+      return (b.updatedAt || 0) - (a.updatedAt || 0);
+    });
+  }
+
+  function tileHTML(r) {
+    var isClean = r.type === "clean";
+    var badgeLabel = isClean ? "نظيفة" : "مستعملة";
+    var typeBtn = isClean
+      ? '<button class="tile-btn use" data-act="use" data-id="' + esc(r._id) + '">✅ تم استعمالها</button>'
+      : '<button class="tile-btn restore" data-act="restore" data-id="' + esc(r._id) + '">↩️ إرجاع لنظيفة</button>';
+
+    return '<div class="tile ' + esc(r.type) + '">' +
+      '<div class="tile-head">' +
+        '<div class="tile-sim">' + esc(r.sim) + '</div>' +
+        '<span class="tile-badge ' + esc(r.type) + '">' + badgeLabel + '</span>' +
+      '</div>' +
+
+      (r.company
+        ? '<div class="tile-company"><span class="tc-icon">🏢</span><span class="tc-name">' + esc(r.company) + '</span></div>'
+        : '<div class="tile-company"><span class="tc-icon">🏢</span><span class="tc-name" style="color:var(--muted);font-weight:400;">بدون شركة</span></div>') +
+
+      (r.notes ? '<div class="tile-notes">📝 ' + esc(r.notes) + '</div>' : '') +
+
+      '<div class="tile-actions">' +
+        typeBtn +
+        '<button class="tile-btn copy" data-act="copy" data-copy="' + esc(r.sim) + '">📋 نسخ</button>' +
+        '<button class="tile-btn" data-act="edit" data-id="' + esc(r._id) + '">✏️ تعديل</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function render() {
+    updateCounts();
+    var list = sortSims(Array.from(sims.values()).filter(matches));
+
+    /* Main tabs state */
+    document.querySelectorAll(".main-tab").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.tab === activeTab);
+    });
+
+    /* Side nav state */
+    document.querySelectorAll(".side-nav-btn").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.panel === activeTab);
+    });
+    document.querySelectorAll(".side-panel").forEach(function (p) {
+      p.classList.toggle("active", p.id === "panel-" + activeTab);
+    });
+
+    /* Main grid */
+    if (!list.length) {
+      var isClean = activeTab === "clean";
+      $("grid").innerHTML = '<div class="empty"><span class="big">' + (isClean ? "🟢" : "🟡") + '</span>' +
+        '<div class="empty-title">' + (isClean ? "لا توجد شرائح نظيفة" : "لا توجد شرائح مستعملة") + '</div>' +
+        '<div class="empty-sub">' + (query ? "لا نتائج مطابقة للبحث." : "اضغط ＋ للإضافة أو 📋 لاستيراد مجموعة.") + '</div></div>';
+    } else {
+      $("grid").innerHTML = list.map(tileHTML).join("");
+    }
+
+    /* Side lists — clean */
+    var cleanList = getClean().sort(function (a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    $("snCleanListCount").textContent = cleanList.length;
+    $("snCleanList").innerHTML = cleanList.length
+      ? cleanList.slice(0, 60).map(function (r) {
+          return '<button type="button" class="mini-item clean" data-id="' + esc(r._id) + '">' +
+            '<span class="mi-sim">' + esc(r.sim) + '</span>' +
+            '<span class="mi-meta"><span>' + esc(r.company || "—") + '</span><span>🟢</span></span>' +
+          '</button>';
+        }).join("")
+      : '<div class="mini-empty">لا توجد شرائح نظيفة</div>';
+
+    /* Side lists — used */
+    var usedList = getUsed().sort(function (a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
+    $("snUsedListCount").textContent = usedList.length;
+    $("snUsedList").innerHTML = usedList.length
+      ? usedList.slice(0, 60).map(function (r) {
+          return '<button type="button" class="mini-item used" data-id="' + esc(r._id) + '">' +
+            '<span class="mi-sim">' + esc(r.sim) + '</span>' +
+            '<span class="mi-meta"><span>' + esc(r.company || "—") + '</span><span>🟡</span></span>' +
+          '</button>';
+        }).join("")
+      : '<div class="mini-empty">لا توجد شرائح مستعملة</div>';
+  }
+
+  /* ============================================================
+     ACTIONS
+     ============================================================ */
+  function setType(id, type) {
+    var r = sims.get(id);
+    if (!r) return;
+    r.type = type;
+    r.updatedAt = Date.now();
+    saveData();
+    render();
+    toast(type === "used" ? "✅ تم نقل الشريحة إلى قائمة المستعملة" : "↩️ تم إرجاع الشريحة إلى قائمة النظيفة");
+  }
+
+  function deleteSim(id) {
+    var r = sims.get(id);
+    if (!r) return;
+    lastDeleted = { rec: r };
+    sims.delete(id);
+    saveData();
+    render();
+    toast("تم حذف الشريحة", "تراجع", function () {
+      if (lastDeleted && lastDeleted.rec) {
+        sims.set(lastDeleted.rec._id, lastDeleted.rec);
+        saveData(); render();
+        toast("تم التراجع");
       }
-      await LN.schedule({ notifications: [{ id: 999999991, title: "اختبار المنبه", body: "إذا ظهر هذا الإشعار فالمنبه يعمل.", channelId: "alarms", schedule: { at: new Date(Date.now() + 10000), allowWhileIdle: true } }] });
-      m.textContent = "سيصلك إشعار خلال 10 ثوانٍ. اخرج من التطبيق وانتظر.";
-    } catch (e) { m.textContent = "تعذر الاختبار."; }
+    });
+  }
+
+  /* ============================================================
+     ADD/EDIT MODAL
+     ============================================================ */
+  function openDlg(id) {
+    editingId = id || null;
+    delArmed = false;
+    var r = editingId ? sims.get(editingId) : null;
+    if (editingId && !r) editingId = null;
+
+    $("dlgTitle").textContent = r ? "تعديل الشريحة" : "إضافة شريحة";
+    $("f-sim").value = r ? r.sim : "";
+    $("f-company").value = r ? (r.company || "") : "";
+    $("f-type").value = r ? r.type : activeTab;
+    $("f-notes").value = r ? (r.notes || "") : "";
+    $("err").textContent = "";
+    var db = $("delBtn");
+    db.hidden = !r;
+    db.textContent = "حذف";
+    $("overlay").hidden = false;
+    setTimeout(function () { $("f-sim").focus(); }, 60);
+  }
+  function closeDlg() { $("overlay").hidden = true; editingId = null; delArmed = false; }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    var errEl = $("err");
+    var sim = $("f-sim").value.trim();
+    if (!sim) { errEl.textContent = "أدخل رقم الشريحة."; $("f-sim").focus(); return; }
+
+    /* Duplicate check */
+    var dup = false;
+    sims.forEach(function (r) { if (r.sim === sim && r._id !== editingId) dup = true; });
+    if (dup) { errEl.textContent = "رقم الشريحة موجود مسبقاً."; return; }
+
+    var now = Date.now();
+    var id = editingId || uid();
+    var prev = editingId ? sims.get(editingId) : null;
+
+    sims.set(id, {
+      _id: id,
+      sim: sim,
+      company: $("f-company").value,
+      type: $("f-type").value,
+      notes: $("f-notes").value.trim(),
+      createdAt: prev ? (prev.createdAt || now) : now,
+      updatedAt: now
+    });
+    saveData();
+    closeDlg();
+    render();
+    toast(editingId ? "تم التحديث ✓" : "تمت الإضافة ✓");
+  }
+
+  function handleDelete() {
+    if (!editingId) return;
+    if (!delArmed) { delArmed = true; $("delBtn").textContent = "تأكيد الحذف؟"; return; }
+    var rec = sims.get(editingId);
+    if (!rec) return;
+    lastDeleted = { rec: rec };
+    sims.delete(editingId);
+    saveData(); closeDlg(); render();
+    toast("تم الحذف", "تراجع", function () {
+      if (lastDeleted && lastDeleted.rec) {
+        sims.set(lastDeleted.rec._id, lastDeleted.rec);
+        saveData(); render();
+        toast("تم التراجع");
+      }
+    });
+  }
+
+  /* ============================================================
+     BULK MODAL
+     ============================================================ */
+  function openBulk() {
+    $("b-list").value = "";
+    $("b-company").value = "";
+    $("b-type").value = activeTab;
+    $("bulkErr").textContent = "";
+    updateBulkCount();
+    $("bulkOverlay").hidden = false;
+    setTimeout(function () { $("b-list").focus(); }, 60);
+  }
+  function closeBulk() { $("bulkOverlay").hidden = true; }
+
+  function updateBulkCount() {
+    var lines = $("b-list").value.split(/[\s,;،\n\r]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    $("bulkCount").textContent = lines.length + " رقم";
+  }
+  $("b-list").addEventListener("input", updateBulkCount);
+
+  function handleBulkSubmit(e) {
+    e.preventDefault();
+    var errEl = $("bulkErr");
+    var lines = $("b-list").value.split(/[\s,;،\n\r]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    if (!lines.length) { errEl.textContent = "الصق رقم واحد على الأقل."; return; }
+
+    var company = $("b-company").value;
+    var type = $("b-type").value;
+    var now = Date.now();
+    var added = 0, dupes = 0;
+
+    /* Build existing sims index */
+    var existing = {};
+    sims.forEach(function (r) { existing[r.sim] = true; });
+
+    lines.forEach(function (sim) {
+      if (existing[sim]) { dupes++; return; }
+      var id = uid();
+      sims.set(id, {
+        _id: id, sim: sim, company: company, type: type,
+        notes: "استيراد مجموعة", createdAt: now + added, updatedAt: now + added
+      });
+      existing[sim] = true;
+      added++;
+    });
+
+    saveData();
+    closeBulk();
+    activeTab = type;
+    render();
+    toast("تمت إضافة " + added + " شريحة" + (dupes ? " · تجاهل " + dupes + " مكررة" : "") + " ✓");
+  }
+
+  /* ============================================================
+     EXPORT
+     ============================================================ */
+  function exportCSV() {
+    var rows = [["النوع", "رقم الشريحة", "الشركة", "ملاحظات"].map(function (c) { return '"' + c + '"'; }).join(",")];
+    var all = Array.from(sims.values()).sort(function (a, b) {
+      if (a.type !== b.type) return a.type === "clean" ? -1 : 1;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+    all.forEach(function (r) {
+      var type = r.type === "clean" ? "نظيفة" : "مستعملة";
+      rows.push([type, r.sim, r.company || "", r.notes || ""].map(function (v) {
+        return '"' + String(v).replace(/"/g, '""') + '"';
+      }).join(","));
+    });
+    var csv = "\uFEFF" + rows.join("\r\n");
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "sims-" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 800);
+    toast("تم تصدير الملف ✓");
+  }
+
+  /* ============================================================
+     THEME
+     ============================================================ */
+  function applyTheme(t) {
+    if (t === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+      $("themeBtn").textContent = "☀️";
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      $("themeBtn").textContent = "🌙";
+    }
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+  }
+
+  /* ============================================================
+     DRAWER
+     ============================================================ */
+  function openDrawer() { $("drawer").classList.add("open"); $("drawer").setAttribute("aria-hidden", "false"); $("drawerScrim").classList.add("open"); }
+  function closeDrawer() { $("drawer").classList.remove("open"); $("drawer").setAttribute("aria-hidden", "true"); $("drawerScrim").classList.remove("open"); }
+
+  /* ============================================================
+     WIPE
+     ============================================================ */
+  function wipeAll() {
+    if (!confirm("حذف جميع الشرائح (" + sims.size + ")؟")) return;
+    if (!confirm("تأكيد أخير: لا يمكن التراجع.")) return;
+    sims = new Map();
+    saveData();
+    render();
+    closeDrawer();
+    toast("تم حذف جميع الشرائح");
+  }
+
+  /* ============================================================
+     EVENT BINDINGS
+     ============================================================ */
+  /* Main tabs */
+  $("mainTabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".main-tab");
+    if (!b) return;
+    activeTab = b.dataset.tab;
+    query = "";
+    $("q").value = "";
+    $("clearQ").classList.remove("show");
+    render();
   });
 
-  loadAll(); render(); scheduleNotifs();
+  /* Side nav */
+  document.querySelectorAll(".side-nav-btn").forEach(function (b) {
+    b.addEventListener("click", function () {
+      activeTab = b.dataset.panel;
+      query = "";
+      $("q").value = "";
+      $("clearQ").classList.remove("show");
+      render();
+    });
+  });
+
+  /* Search */
+  $("q").addEventListener("input", function (e) {
+    query = e.target.value;
+    $("clearQ").classList.toggle("show", !!query);
+    render();
+  });
+  $("clearQ").addEventListener("click", function () {
+    query = ""; $("q").value = ""; $("clearQ").classList.remove("show"); render();
+  });
+
+  /* Grid actions */
+  $("grid").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-act]");
+    if (!btn) return;
+    var act = btn.dataset.act;
+    var id = btn.dataset.id;
+    if (act === "use") setType(id, "used");
+    else if (act === "restore") setType(id, "clean");
+    else if (act === "edit") openDlg(id);
+    else if (act === "copy") copyText(btn.dataset.copy);
+  });
+
+  /* Side list — open item on click */
+  $("snCleanList").addEventListener("click", function (e) {
+    var b = e.target.closest(".mini-item");
+    if (!b) return;
+    closeDrawer();
+    setTimeout(function () { openDlg(b.dataset.id); }, 200);
+  });
+  $("snUsedList").addEventListener("click", function (e) {
+    var b = e.target.closest(".mini-item");
+    if (!b) return;
+    closeDrawer();
+    setTimeout(function () { openDlg(b.dataset.id); }, 200);
+  });
+
+  /* Drawer controls */
+  $("menuBtn").addEventListener("click", openDrawer);
+  $("drawerClose").addEventListener("click", closeDrawer);
+  $("drawerScrim").addEventListener("click", closeDrawer);
+
+  /* Drawer actions */
+  $("dAddClean").addEventListener("click", function () {
+    closeDrawer();
+    setTimeout(function () { activeTab = "clean"; render(); openDlg(null); }, 200);
+  });
+  $("dAddMany").addEventListener("click", function () {
+    closeDrawer();
+    setTimeout(openBulk, 200);
+  });
+  $("dExpCSV").addEventListener("click", exportCSV);
+  $("dWipe").addEventListener("click", wipeAll);
+
+  /* Header buttons */
+  $("addBtn").addEventListener("click", function () { openDlg(null); });
+  $("addManyBtn").addEventListener("click", openBulk);
+
+  /* Modal close */
+  $("closeDlg").addEventListener("click", closeDlg);
+  $("bulkClose").addEventListener("click", closeBulk);
+
+  /* Form submit */
+  $("form").addEventListener("submit", handleSubmit);
+  $("bulkForm").addEventListener("submit", handleBulkSubmit);
+  $("delBtn").addEventListener("click", handleDelete);
+
+  /* Theme */
+  $("themeBtn").addEventListener("click", function () {
+    var isLight = document.documentElement.getAttribute("data-theme") === "light";
+    applyTheme(isLight ? "dark" : "light");
+  });
+
+  /* Overlay clicks */
+  $("overlay").addEventListener("click", function (e) { if (e.target === $("overlay")) closeDlg(); });
+  $("bulkOverlay").addEventListener("click", function (e) { if (e.target === $("bulkOverlay")) closeBulk(); });
+
+  /* Escape */
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!$("overlay").hidden) closeDlg();
+    else if (!$("bulkOverlay").hidden) closeBulk();
+    else if ($("drawer").classList.contains("open")) closeDrawer();
+  });
+
+  /* ============================================================
+     INIT
+     ============================================================ */
+  try {
+    var savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "light") applyTheme("light");
+    else if (savedTheme === "dark") applyTheme("dark");
+    else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) applyTheme("light");
+  } catch (e) {}
+
+  loadData();
+  render();
+
+  /* Confirm seed on first run */
+  if (getClean().length === SEED_CLEAN_SIMS.length && getUsed().length === 0) {
+    setTimeout(function () {
+      toast("تم استيراد " + SEED_CLEAN_SIMS.length + " شريحة نظيفة تلقائياً ✓");
+    }, 700);
+  }
 })();
 </script>
 </body>
